@@ -15,6 +15,7 @@ from poke_env import AccountConfiguration
 from poke_env.player.player import Player
 
 
+
 def convert_results_to_html(csv_file: str, html_file: str):
     with open(csv_file, newline="", encoding="utf-8") as infile:
         reader = csv.reader(infile, delimiter="\t")
@@ -168,7 +169,7 @@ def run_swiss_round(
     round_num = 0
 
     print(
-        f"🏆 Starting tournament with {len(competitors)} players (Win cap: {win_cap}, Loss cap: {loss_cap})"
+        f" Starting tournament with {len(competitors)} players (Win cap: {win_cap}, Loss cap: {loss_cap})"
     )
 
     for competitor in competitors:
@@ -206,7 +207,7 @@ def run_swiss_round(
                             unpaired.pop(i)
                             winner, loser = asyncio.run(run_battle(p1, p2))
                             print(
-                                f"Group {group_key}: {p1.username} vs {p2.username} → Winner: {winner.username}"
+                                f"Group {group_key}: {p1.username} vs {p2.username} ... Winner: {winner.username}"
                             )
                             file.write(
                                 f"{round_num}\t{group_key}\t{p1.username}\t{p2.username}\t{winner.username}\tno\n"
@@ -234,7 +235,7 @@ def run_swiss_round(
                         f"{round_num}\t{group_key}\t{bye_player.username}\t' '\t {bye_player.username}\tyes\n"
                     )
 
-    print("\n🏁 Final Results:")
+    print("\nFinal Results:")
     final_sorted = sorted(competitors, key=lambda p: (-p.wins, p.losses, p.id))
 
     with open(summary_file, "a", encoding="utf-8") as file:
@@ -275,7 +276,7 @@ def generate_bots(num_bots: int):
 
         spec = importlib.util.spec_from_file_location(module_name, module_path)
         if spec is None or spec.loader is None:
-            print(f"⚠️ Could not load module {module_name}. Skipping.")
+            print(f" Could not load module {module_name}. Skipping.")
             raise ImportError(
                 f"Could not load module {module_name}. Please check the file path."
             )
@@ -317,7 +318,7 @@ def run_swiss_phase(top_k: int, competitors: List[Competitor]):
     while len(competitors) > top_k:
         num_competitors = len(competitors)
 
-        print(f"\n🏆 Starting a new tournament with {num_competitors} competitors")
+        print(f"\n Starting a new tournament with {num_competitors} competitors")
 
         results_file = os.path.join(
             os.path.dirname(__file__),
@@ -327,8 +328,8 @@ def run_swiss_phase(top_k: int, competitors: List[Competitor]):
         if not os.path.exists(os.path.dirname(results_file)):
             os.makedirs(os.path.dirname(results_file))
 
-        with open(results_file, "w", encoding="utf-8") as file:
-            pass  # This opens the file in write mode, clearing it
+        with open(results_file, "a", encoding="utf-8") as file:
+            file.write("---------------------------New set of results-------------------")  # This opens the file in write mode, clearing it
 
         summary_file = os.path.join(
             os.path.dirname(__file__),
@@ -338,9 +339,10 @@ def run_swiss_phase(top_k: int, competitors: List[Competitor]):
         if not os.path.exists(os.path.dirname(summary_file)):
             os.makedirs(os.path.dirname(summary_file))
 
-        with open(summary_file, "w", encoding="utf-8") as file:
-            pass  # This opens the file in write mode, clearing it
-
+        #with open(summary_file, "w", encoding="utf-8") as file:
+          #  pass  # This opens the file in write mode, clearing it
+        with open(summary_file, "a", encoding="utf-8") as file:
+            file.write("---------------------------New set of results-------------------\n")  # This opens the file in write mode, clearing it
         cap = 3
 
         competitors = run_swiss_round(
@@ -365,7 +367,7 @@ def run_swiss_phase(top_k: int, competitors: List[Competitor]):
             ),
         )
 
-    print(f"\nSWISS Rounds 🏆 Tournament Summary (Top {top_k}):")
+    print(f"\nSWISS Rounds Tournament Summary (Top {top_k}):")
     for competitor in competitors:
         print(
             f"Player {competitor.id:3d} {competitor.username} | W: {competitor.wins}, L: {competitor.losses}"
@@ -385,8 +387,10 @@ def run_knockout_phase(players_ranked: list[Competitor]):
     if not os.path.exists(os.path.dirname(results_file)):
         os.makedirs(os.path.dirname(results_file))
 
-    with open(results_file, "w", encoding="utf-8") as file:
-        pass  # This opens the file in write mode, clearing it
+    #with open(results_file, "w", encoding="utf-8") as file:
+    #    pass  # This opens the file in write mode, clearing it
+    with open(results_file, "a", encoding="utf-8") as file:
+            file.write("---------------------------New set of results-------------------\n")  # This opens the file in write mode, clearing it
 
     replay_dir = os.path.join(os.path.dirname(__file__), "replays")
     if not os.path.exists(replay_dir):
@@ -448,12 +452,12 @@ def run_competition(
     competitors = [Competitor(i + 1, p.username, p) for i, p in enumerate(players)]
 
     if len(competitors) < top_k:
-        print(f"⚠️ Not enough players found ({len(players)}) to start a tournament.")
+        print(f"Not enough players found ({len(players)}) to start a tournament.")
         return
 
     bots_to_add = bots_to_add_for_clean_halving(len(competitors), top_k)
 
-    print(f"🤖 Adding {bots_to_add} bots to make a clean halving for {top_k} players")
+    print(f"Adding {bots_to_add} bots to make a clean halving for {top_k} players")
 
     bots = generate_bots(bots_to_add)
 
@@ -465,9 +469,9 @@ def run_competition(
 
     top_k_competitors = run_swiss_phase(top_k, competitors)
 
-    print("\n🏁 Knockout Rounds:")
+    print("\nKnockout Rounds:")
     winner = run_knockout_phase(top_k_competitors)
-    print(f"\n🏆 Final Winner: {winner.username} (ID: {winner.id})")
+    print(f"\nFinal Winner: {winner.username} (ID: {winner.id})")
 
 
 def main():
