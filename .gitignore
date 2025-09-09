@@ -1,5 +1,8 @@
 __pycache__/
+showdown_agent/scripts/results
+showdown_agent/scripts/replays
 venv/
+.venv/
 # Default ignored files
 /shelf/
 /workspace.xml
@@ -17,4 +20,5 @@ rl_logs/
 .vscode/
 pokeenv/scripts/replays/*
 pokeenv/scripts/results/*
+
 
