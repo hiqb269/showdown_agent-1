@@ -1,0 +1,63 @@
+team = """
+Kyogre @ Choice Scarf
+Ability: Drizzle
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+IVs: 0 Atk
+- Water Spout
+- Origin Pulse
+- Ice Beam
+- Thunder
+
+Koraidon @ Choice Band
+Ability: Orichalcum Pulse
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flare Blitz
+- U-turn
+- Collision Course
+- Dragon Claw
+
+Arceus @ Heavy-Duty Boots
+Ability: Multitype
+Tera Type: Normal
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+IVs: 0 Atk
+- Stealth Rock
+- Will-O-Wisp
+- Recover
+- Judgment
+
+Ting-Lu @ Leftovers
+Ability: Vessel of Ruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Whirlwind
+- Ruination
+- Earthquake
+
+Corviknight @ Leftovers
+Ability: Pressure
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 SpD
+Impish Nature
+- Iron Head
+- U-turn
+- Roost
+- Brave Bird
+
+Chien-Pao @ Focus Sash
+Ability: Sword of Ruin
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Icicle Crash
+- Sacred Sword
+- Swords Dance
+"""
