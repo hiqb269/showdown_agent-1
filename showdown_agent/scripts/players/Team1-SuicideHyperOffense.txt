@@ -1,0 +1,62 @@
+team = """
+Deoxys-Speed @ Focus Sash  
+Ability: Pressure  
+Tera Type: Psychic  
+EVs: 248 HP / 8 SpD / 252 Spe  
+Timid Nature  
+IVs: 0 Atk  
+- Stealth Rock  
+- Spikes  
+- Thunder Wave  
+- Taunt
+
+Koraidon @ Choice Band  
+Ability: Orichalcum Pulse  
+Tera Type: Fighting  
+EVs: 252 Atk / 4 SpD / 252 Spe  
+Jolly Nature  
+- Dragon Claw  
+- Collision Course  
+- Flare Blitz  
+- U-turn
+
+Chi-Yu @ Choice Specs
+Ability: Beads of Ruin
+EVs: 4 Def / 252 SpA / 252 Spe
+Tera Type: Fire
+Timid Nature
+- Overheat
+- Flamethrower
+- Fire Blast
+- Dark Pulse
+
+Walking Wake @ Choice Specs
+Ability: Protosynthesis
+EVs: 12 HP / 244 SpA / 252 Spe
+Tera Type: Water
+Timid Nature
+- Hydro Steam
+- Draco Meteor
+- Flamethrower
+- Dragon Pulse
+
+Flutter Mane @ Booster Energy  
+Ability: Protosynthesis  
+Tera Type: Ghost  
+EVs: 252 SpA / 4 SpD / 252 Spe  
+Timid Nature  
+IVs: 0 Atk  
+- Moonblast  
+- Shadow Ball  
+- Mystical Fire  
+- Psyshock
+
+Kingambit @ Life Orb
+Ability: Supreme Overlord
+EVs: 252 Atk / 4 Def / 252 Spe
+Tera Type: Ghost
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head

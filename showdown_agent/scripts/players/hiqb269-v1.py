@@ -3,18 +3,67 @@ from poke_env.battle import AbstractBattle, Move, Pokemon
 from poke_env.player import Player
 
 team = """
-Pikachu @ Focus Sash  
-Ability: Static  
-Tera Type: Electric  
-EVs: 8 HP / 248 SpA / 252 Spe  
+Necrozma-Dusk-Mane @ Rocky Helmet  
+Ability: Prism Armor  
+Tera Type: Water  
+EVs: 252 HP / 252 Atk / 4 SpD  
+Adamant Nature  
+- Sunsteel Strike  
+- Earthquake  
+- Outrage  
+- Morning Sun
+
+Koraidon @ Choice Band  
+Ability: Orichalcum Pulse  
+Tera Type: Fire  
+EVs: 252 Atk / 4 SpD / 252 Spe  
+Jolly Nature  
+- Flare Blitz  
+- Close Combat  
+- Outrage 
+- Iron Head
+
+Kyogre @ Choice Specs  
+Ability: Drizzle  
+Tera Type: Water  
+EVs: 252 HP / 252 SpA / 4 Spe  
+Hasty Nature  
+- Water Spout  
+- Rock Slide  
+- Ice Beam  
+- Thunder 
+
+Zacian-Crowned @ Rusted Sword  
+Ability: Intrepid Sword  
+Tera Type: Fairy  
+EVs: 8 HP / 248 Atk / 252 Spe  
+Jolly Nature  
+- Behemoth Blade  
+- Play Rough  
+- Close Combat  
+- Wild Charge
+
+Ho-Oh @ Heavy-Duty Boots  
+Ability: Regenerator  
+Tera Type: Flying  
+EVs: 4 HP / 252 Atk / 252 SpD  
+Careful Nature  
+- Sacred Fire  
+- Brave Bird  
+- Earthquake  
+- Recover 
+
+Arceus-Ground @ Earth Plate  
+Ability: Multitype  
+Tera Type: Ground  
+EVs: 252 HP / 4 SpA / 252 Spe  
 Timid Nature  
 IVs: 0 Atk  
-- Thunder Wave  
-- Thunder  
-- Reflect
-- Thunderbolt  
+- Judgment  
+- Calm Mind  
+- Recover  
+- Ice Beam
 """
-
 
 class CustomAgent(Player):
     def __init__(self, *args, **kwargs):
@@ -62,4 +111,3 @@ class CustomAgent(Player):
     
     def choose_move(self, battle: AbstractBattle):
          return self.choose_action(battle)
-

@@ -1,6 +1,8 @@
 __pycache__/
 showdown_agent/scripts/results
 showdown_agent/scripts/replays
+showdown_agent/scripts/otherplayers
+showdown_agent/scripts/extraplayers
 venv/
 .venv/
 # Default ignored files
