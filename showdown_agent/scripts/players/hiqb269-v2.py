@@ -70,9 +70,7 @@ class CustomAgent(Player):
     def __init__(self, *args, **kwargs):
         super().__init__(team=team, *args, **kwargs)
         self.opponent_team_seen = set()
-        self.game_phase = "early"  # early, mid, late
-        self.hazards_set = {"stealthrock": False, "spikes": 0}
-        self.sun_active = False
+        self.game_phase = "early"
         self.tera_move = False
         self.debug = True
 
@@ -88,230 +86,72 @@ class CustomAgent(Player):
             "side_conditions": battle.side_conditions,
             "opponent_side_conditions": battle.opponent_side_conditions,
             "can_tera": battle.can_tera,
-    }
+        }
 
-    def update_game_state(self, battle):
-        # Update opponent team knowledge
-        if battle.opponent_active_pokemon:
-            self.opponent_team_seen.add(battle.opponent_active_pokemon.species)
-        
-        # Check if sun is active (from Koraidon's ability)
-        weather = getattr(battle, 'weather', None)
-        wname = ""
+    def is_sun_active(self, weather: Weather) -> bool:
         if weather:
             wname = str(next(iter(weather.keys()))).lower() if weather else ""  
-            self.sun_active =  "sun" in wname
-        
-        # Update hazards tracking
-        if battle.opponent_side_conditions:
-            self.hazards_set["stealthrock"] = "stealthrock" in battle.opponent_side_conditions
-            spikes_count = 0
-            if "spikes" in battle.opponent_side_conditions:
-                spikes_count = battle.opponent_side_conditions["spikes"]
-                self.hazards_set["spikes"] = spikes_count
+            return "sun" in wname
+        return False
 
-        # Determine game phase based on team status
+    def update_game_state(self, battle):
+        if battle.opponent_active_pokemon:
+            self.opponent_team_seen.add(battle.opponent_active_pokemon.species)
+
         alive_count = len([p for p in battle.team.values() if not p.fainted])
-        if alive_count >= 5:  # and battle.active_pokemon.species == "deoxysspeed"
+        if alive_count >= 5:
             self.game_phase = "early"
         elif alive_count >= 3:
             self.game_phase = "mid"
         else:
             self.game_phase = "late"
-        print(f"Debug: Game phase: {self.game_phase}, Hazards: {self.hazards_set}, Sun: {self.sun_active}")
-    
+        sun_active = self.is_sun_active(getattr(battle, 'weather', None))
+        
+        if self.debug:
+            print(f"Debug: Game phase: {self.game_phase}, Opponent Hazards: {battle.opponent_side_conditions}, Sun: {sun_active}")
 
     def has_magic_bounce(self, opponent: Pokemon) -> bool:
         if opponent.ability:
-            print(f"Debug: Checking for Magic Bounce on {opponent.species} with ability {opponent.ability}")
+            if self.debug:
+                print(f"Debug: Checking for Magic Bounce on {opponent.species} with ability {opponent.ability}")
         return opponent.ability and "magic bounce" in opponent.ability.lower()
 
-    def is_setup_threat(self, opponent: Pokemon) -> bool:
-        setup_threats = {
-            "arceus", "dialga", "palkia", "giratina", "rayquaza", "groudon", "kyogre",
-            "necrozma-dusk-mane", "necrozma-dawn-wings", "zacian", "eternatus"
-        }
-        return any(threat in opponent.species.lower() for threat in setup_threats)
-    
-    def choose_early_game_action(self, state):
-        my_pokemon = state["my_pokemon"]
-        opponent = state["opponent_pokemon"]
-
-        if my_pokemon.species != "deoxysspeed":
-            # Should switch to Deoxys if available
-            for switch in state["available_switches"]:
-                if switch.species == "deoxysspeed":
-                    print("Debug: Switching to Deoxysspeed to start hazard setting")
-                    return switch
+    ## NEW HELPER: Checks if we are in a bad matchup
+    def is_bad_matchup(self, my_pokemon: Pokemon, opponent: Pokemon) -> bool:
+        # It's a bad matchup if they have a super-effective STAB against us
+        for opp_type in opponent.types:
+            if my_pokemon.damage_multiplier(opp_type) > 1:
+                return True
         
-        # Deoxys-Speed decision tree
-        if self.has_magic_bounce(opponent):
-            # Use Taunt against Magic Bounce
-            for move in state["available_moves"]:
-                if move.id == "taunt":
-                    if self.debug:
-                        print("Using Taunt against Magic Bounce")
-                    return move
-                        
-        # Priority: Stealth Rock > Spikes > Thunder Wave for threats > more Spikes
-        if not self.hazards_set["stealthrock"]:
-            for move in state["available_moves"]:
-                if move.id == "stealthrock":
-                    if self.debug:
-                        print("Setting Stealth Rock")
-                    self.hazards_set["stealthrock"] = True
-                    return move
-        
-        if self.hazards_set["spikes"] < 2:  # Set up to 2 layers of spikes
-            for move in state["available_moves"]:
-                if move.id == "spikes":
-                    if self.debug:
-                        print(f"Setting Spikes (layer {self.hazards_set['spikes'] + 1})")
-                    self.hazards_set["spikes"] += 1
-                    return move
-        
-        if self.is_setup_threat(opponent):
-            for move in state["available_moves"]:
-                if move.id == "thunderwave":
-                    if self.debug:
-                        print("Using Thunder Wave on setup threat")
-                    return move
-        
-        return self.choose_best_attack(state)
-
-    def choose_mid_game_action(self, state):
-        my_pokemon = state["my_pokemon"]
-        opponent = state["opponent_pokemon"]
-        
-        wallbreakers = ["koraidon", "walkingwake", "chiyu"]
-        
-        if my_pokemon.species not in wallbreakers:
-            # Switch to appropriate wallbreaker
-            best_switch = self.choose_best_wallbreaker(state, opponent)
-            if best_switch:
-                if self.debug:
-                    print(f"Switching to wallbreaker: {best_switch.species}")
-                return best_switch
-
-        # Wallbreaker-specific logic
-        if my_pokemon.species == "koraidon":
-            return self.choose_koraidon_move(state)
-        #elif my_pokemon.species == "walkingwake":
-        #    return self.choose_walking_wake_move(state)
-        #elif my_pokemon.species == "chiyu":
-        #    return self.choose_chi_yu_move(state)
-        
-        return self.choose_best_attack(state)
-
-    def choose_late_game_action(self, battle, state):
-        my_pokemon = state["my_pokemon"]
-        opponent = state["opponent_pokemon"]   
-        cleaners = ["fluttermane", "kingambit"]   
-        if my_pokemon.species not in cleaners:
-            # Switch to appropriate cleaner
-            best_cleaner = self.choose_best_cleaner(state, opponent)
-            if best_cleaner:
-                if self.debug:
-                    print(f"Switching to cleaner: {best_cleaner.species}")
-                return best_cleaner
-        
-        #if my_pokemon.species == "fluttermane":
-        #    return self.choose_flutter_mane_move(state)
-        if my_pokemon.species == "kingambit":
-            return self.choose_kingambit_move(state, battle)
-        return self.choose_best_attack(state)
-
-    def choose_best_wallbreaker(self, state, opponent: Pokemon) -> Optional[Pokemon]:
-        """Choose the best wallbreaker for the current opponent"""
-        available_wallbreakers = []
-        wallbreaker_names = ["koraidon", "walking-wake", "chiyu"]
-        
-        for switch in state["available_switches"]:
-            if any(name in switch.species for name in wallbreaker_names):
-                available_wallbreakers.append(switch)
-        
-        if not available_wallbreakers:
-            return None
+        # It's a bad matchup if we can't deal at least neutral damage
+        can_hit_neutrally = False
+        for move in my_pokemon.moves.values():
+            if opponent.damage_multiplier(move) >= 1:
+                can_hit_neutrally = True
+                break
+        if not can_hit_neutrally:
+            return True
             
-        # Simple heuristic: Koraidon for physical walls, special attackers for special walls
-        # In real implementation, you'd want more sophisticated type matchup logic
-        return available_wallbreakers[0]
-
-    def choose_best_cleaner(self, state, opponent: Pokemon) -> Optional[Pokemon]:
-        """Choose the best cleaner for late game"""
-        for switch in state["available_switches"]:
-            if "fluttermane" in switch.species or "kingambit" in switch.species:
-                return switch
-        return None
-
-    def choose_koraidon_move(self, state):
+        return False
+    
+    ## NEW HELPER: Checks for a winning move to override all other logic
+    def has_winning_move(self, state) -> Optional[Move]:
+        my_pokemon = state["my_pokemon"]
         opponent = state["opponent_pokemon"]
+        
         for move in state["available_moves"]:
-            if move.id == "uturn":
-                # A simple heuristic: U-turn if the opponent is a threat
-                if opponent.damage_multiplier(PokemonType.FIGHTING) > 1 or opponent.damage_multiplier(PokemonType.DRAGON) > 1:
-                     if self.debug:
-                         print("Koraidon running away with U-turn against a threat")
-                     return move
-        # If not pivoting, find the best attacking move
-        return self.choose_best_attack(state)
+            if move.category == MoveCategory.STATUS:
+                continue
+            
+            # Check for super-effective moves first
+            if opponent.damage_multiplier(move) > 1:
+                damage = self.estimate_damage(move, state)
+                if opponent.current_hp and damage >= opponent.current_hp:
+                    if self.debug:
+                        print(f"Debug: Found potential KO move: {move.id} with estimated damage {damage:.2f} vs opponent HP {opponent.current_hp}")
+                    return move
+        return None
     
-
-    def choose_walking_wake_move(self, state):
-        return self.choose_best_attack(state)
-
-
-    def choose_chi_yu_move(self, state):
-        return self.choose_best_attack(state)
-
-    def choose_flutter_mane_move(self, state):
-        return self.choose_best_attack(state)
-
-    def choose_kingambit_move(self, state, battle):
-        opponent = state["opponent_pokemon"]
-        my_pokemon = state["my_pokemon"]
-        best_attack = self.choose_best_attack(state)
-        # Consider Tera activation for securing KO
-        if battle.can_tera and self.should_tera_kingambit(opponent, my_pokemon):
-            if self.debug:
-                print("Kingambit considering Tera activation")
-            if best_attack:
-                normal_damage_estimate = self.estimate_damage(best_attack, state)
-                tera_damage_estimate = normal_damage_estimate * (2 / 1.5) # Approximate Tera Dark boost
-            if normal_damage_estimate < opponent.current_hp and tera_damage_estimate >= opponent.current_hp:
-                if self.debug:
-                    print("Kingambit: Activating Offensive Tera to secure KO!")
-                self.tera_move = True
-                return best_attack
-
-        # Defensive Tera: If facing a lethal Fighting-type threat.
-        if "koraidon" in opponent.species.lower() or "ironvaliant" in opponent.species.lower():
-             if self.debug:
-                print("Kingambit: Activating Defensive Tera to survive!")
-             self.tera_move = True
-             return best_attack
-
-        return best_attack
-    
-    def estimate_damage(self, move: Move, state) -> float:
-        opponent = state["opponent_pokemon"]
-        my_pokemon = state["my_pokemon"]
-        if not move.base_power or move.base_power == 0:
-            return 0
-        # Simplified damage formula
-        attack_stat = my_pokemon.stats['atk'] if move.category == MoveCategory.PHYSICAL else my_pokemon.stats['spa']
-        defense_stat = opponent.stats['def'] if move.category == MoveCategory.PHYSICAL else opponent.stats['spd']
-        type_multiplier = opponent.damage_multiplier(move)
-        stab = 1.5 if move.type in my_pokemon.types else 1.0
-        if not attack_stat:
-            attack_stat = 1
-        if not defense_stat:
-            defense_stat = 1
-        damage = (((2 * my_pokemon.level / 5 + 2) * move.base_power * attack_stat / defense_stat) / 50 + 2)
-        damage *= stab * type_multiplier
-        return damage
-
-
     def is_bulky_wall(self, opponent: Pokemon) -> bool:
         if not opponent or not opponent.species:
             return False
@@ -324,8 +164,7 @@ class CustomAgent(Player):
         defense = opponent.base_stats.get("def", 0)
         special_defense = opponent.base_stats.get("spd", 0)
         return hp > 100 and (defense > 120 or special_defense > 120)
-
-
+    
     def is_special_wall(self, opponent: Pokemon) -> bool:
         if not opponent or not opponent.base_stats:
             return False
@@ -359,14 +198,12 @@ class CustomAgent(Player):
             if my_pokemon.damage_multiplier(move) > 1:
                 they_threaten_us = True
                 break
-    
         if we_threaten_them and not they_threaten_us:
             return True
         is_weakened = opponent.current_hp_fraction < 0.4
         can_survive = my_pokemon.current_hp_fraction > 0.5
         return is_weakened and can_survive
-
-
+    
     def is_passive_forkinga(self, opponent: Pokemon) -> bool:
         if not opponent or not opponent.species:
             return False  
@@ -374,7 +211,6 @@ class CustomAgent(Player):
         if any(p in opponent.species.lower() for p in passive_species):
             return True
         return opponent.base_stats.get("atk", 100) < 85 and opponent.base_stats.get("spa", 100) < 85
-
 
     def is_kingaopponent_faster(self, opponent: Pokemon, my_pokemon: Pokemon) -> bool:
         # Known setup or pivot Pokémon that often don't attack immediately??
@@ -385,24 +221,167 @@ class CustomAgent(Player):
         my_speed = my_pokemon.stats.get("spe") if my_pokemon.stats.get("spe") else 0
         return opponent_speed > my_speed
 
+    
+    ## FIXED LOGIC for Deoxys hazard setting
+    def choose_early_game_action(self, battle: AbstractBattle, state):
+        my_pokemon = state["my_pokemon"]
+        opponent = state["opponent_pokemon"]
 
-    def should_tera_kingambit(self, opponent: Pokemon, my_pokemon: Pokemon) -> bool:
-        """Determine when to Tera Kingambit"""
-        # If Kingambit has Tera'd into Ghost
-        threatening_types = [PokemonType.GHOST, PokemonType.DARK]
-        if any(opponent.damage_multiplier(threat) > 1.5 for threat in threatening_types):
-            return True #Defensive Tera
-        # for move in opponent.moves.values():
-        #     if my_pokemon.damage_multiplier(move) > 1.5:
-        #         return True
-        # Tera Dark for securing KO or surviving crucial hit
-        #TODO: Add more logic here to ensure KO
-        return (opponent.current_hp_fraction < 0.6 and my_pokemon.current_hp_fraction > 0.3)  
+        if my_pokemon.species != "deoxysspeed":
+            deoxys = next((p for p in state["available_switches"] if p.species == "deoxysspeed"), None)
+            if deoxys:
+                if self.debug:
+                    print("Debug: Switching to Deoxys-Speed to start hazard setting")
+                return deoxys
+
+        if self.has_magic_bounce(opponent):
+            taunt = next((m for m in state["available_moves"] if m.id == "taunt"), None)
+            if taunt:
+                if self.debug:
+                    print("Using Taunt against Magic Bounce")
+                return taunt
+        
+        # Priority list for setting hazards
+        # 1. Set Stealth Rock if not present
+        if SideCondition.STEALTH_ROCK not in battle.opponent_side_conditions:
+            stealth_rock = next((m for m in state["available_moves"] if m.id == "stealthrock"), None)
+            if stealth_rock:
+                if self.debug:
+                    print("Setting Stealth Rock")
+                return stealth_rock
+        
+        # 2. Set Spikes up to 3 layers
+        spikes_layers = battle.opponent_side_conditions.get(SideCondition.SPIKES, 0)
+        if spikes_layers < 3:
+            spikes = next((m for m in state["available_moves"] if m.id == "spikes"), None)
+            if spikes:
+                if self.debug:
+                    print(f"Setting Spikes (layer {spikes_layers + 1})")
+                return spikes
+        
+        # If hazards are fully set, resort to best available attack/status
+        return self.choose_best_attack(state)
+
+
+    def choose_mid_game_action(self, state):
+        my_pokemon = state["my_pokemon"]
+        opponent = state["opponent_pokemon"]
+        
+        wallbreakers = ["koraidon", "walkingwake", "chiyu"]
+        
+        # If not a wallbreaker, check if we're in a bad spot before switching
+        if my_pokemon.species not in wallbreakers:
+            if self.is_bad_matchup(my_pokemon, opponent):
+                if self.debug:
+                    print(f"Debug: {my_pokemon.species} is not a wallbreaker AND is in a bad matchup. Looking to switch.")
+                return self.choose_best_switch(state)
+            else:
+                if self.debug:
+                    print(f"Debug: Matchup is favorable for {my_pokemon.species}, staying in to attack.")
+                return self.choose_best_attack(state)
+
+        return self.choose_best_attack(state)
+
+    ## FIXED LOGIC to be more flexible
+    def choose_late_game_action(self, battle: AbstractBattle, state):
+        my_pokemon = state["my_pokemon"]
+        opponent = state["opponent_pokemon"]   
+        cleaners = ["fluttermane", "kingambit"]
+        
+        if my_pokemon.species == "kingambit":
+            return self.choose_kingambit_move(state, battle)
+        
+        # If not a cleaner, check if we're in a bad spot before switching
+        if my_pokemon.species not in cleaners:
+            if self.is_bad_matchup(my_pokemon, opponent):
+                if self.debug:
+                    print(f"Debug: {my_pokemon.species} is not a cleaner AND is in a bad matchup. Looking to switch.")
+                return self.choose_best_switch(state)
+            else:
+                if self.debug:
+                    print(f"Debug: Matchup is favorable for {my_pokemon.species}, staying in to attack.")
+                return self.choose_best_attack(state)
+
+        return self.choose_best_attack(state)
+
+    def choose_kingambit_move(self, state, battle):
+        my_pokemon = state["my_pokemon"]
+        opponent = state["opponent_pokemon"]
+        
+        swords_dance_move = next((m for m in state["available_moves"] if m.id == "swordsdance"), None)
+        if swords_dance_move and my_pokemon.boosts.get('atk', 0) < 2:
+            if not self.is_bad_matchup(my_pokemon, opponent) and opponent.current_hp_fraction > 0.5:
+                 if self.debug:
+                    print("Kingambit sees a safe opportunity to use Swords Dance.")
+                 return swords_dance_move
+
+        best_attack = self.choose_best_attack(state)
+        if not best_attack:
+            return self.choose_best_switch(state)
+
+        if battle.can_tera and not my_pokemon.is_terastallized:
+            # Simple Tera logic: Tera offensively if it secures a KO on a key threat.
+            normal_damage = self.estimate_damage(best_attack, state)
+            if best_attack.type in my_pokemon.types: # If it's a STAB move
+                tera_damage = normal_damage * (2 / 1.5) # Approximate boost from Tera STAB
+                if opponent.current_hp and normal_damage < opponent.current_hp and tera_damage >= opponent.current_hp:
+                    if self.debug:
+                        print("Kingambit: Activating Offensive Tera to secure KO!")
+                    self.tera_move = True
+                    
+        return best_attack
+    
+
+    def estimate_damage(self, move: Move, state) -> float:
+        opponent = state["opponent_pokemon"]
+        my_pokemon = state["my_pokemon"]
+        if not move.base_power or move.base_power == 0:
+            return 0
+    
+        attack_stat = my_pokemon.stats['atk'] if move.category == MoveCategory.PHYSICAL else my_pokemon.stats['spa']
+        defense_stat = opponent.stats['def'] if move.category == MoveCategory.PHYSICAL else opponent.stats['spd']
+    
+        # These factors are always known, so we define them early.
+        type_multiplier = opponent.damage_multiplier(move)
+        stab = 1.5 if move.type in my_pokemon.types else 1.0
+
+        # If stats are unknown, calculate damage with a neutral Atk/Def ratio.
+        if not attack_stat or not defense_stat:
+            if self.debug:
+                print("Debug: Unknown stats, using conservative damage estimate.")
+            # Simplified formula assuming Atk/Def ratio is 1.
+            estimated_defense = 100  # Arbitrary average defense value
+            damage = (((2 * my_pokemon.level / 5 + 2) * move.base_power/estimated_defense) / 50 + 2)
+            damage *= stab * type_multiplier
+            return damage
+
+    # --- If stats are known, proceed with the full calculation ---
+
+    # Apply boosts
+        attack_boost = my_pokemon.boosts.get('atk', 0) if move.category == MoveCategory.PHYSICAL else my_pokemon.boosts.get('spa', 0)
+        defense_boost = opponent.boosts.get('def', 0) if move.category == MoveCategory.PHYSICAL else opponent.boosts.get('spd', 0)
+    
+        boost_multiplier = [1, 1.5, 2, 2.5, 3, 3.5, 4]
+    
+        if attack_boost >= 0:
+            attack_stat *= boost_multiplier[attack_boost]
+        else:
+            attack_stat /= boost_multiplier[-attack_boost]
+
+        if defense_boost >= 0:
+            defense_stat *= boost_multiplier[defense_boost]
+        else:
+            defense_stat /= boost_multiplier[-defense_boost]
+        
+        # Full formula
+        damage = (((2 * my_pokemon.level / 5 + 2) * move.base_power * attack_stat / defense_stat) / 50 + 2)
+        damage *= stab * type_multiplier
+        return damage
 
     def score_move(self, move: Move, state):
         me = state["my_pokemon"]
         opponent = state["opponent_pokemon"]
-        weather = state.get("weather")
+        weather = state.get("weather", None)
         if not move or not opponent:
             return -float("inf")
             
@@ -455,165 +434,125 @@ class CustomAgent(Player):
             score *= 1.2 # Give a 20% bonus to encourage nuking bulky walls with Draco Meteor
         return score
 
-    
-
-    def choose_best_attack(self, state):
-        best_move = None
-        max_score = -float("inf")
-
-        #if not state["available_moves"] or state["available_moves"] == []:
-
-         # Evaluate each move and pick the best one
-        
-        for move in state["available_moves"]:
-            score = self.score_move(move, state)
-            if score > max_score:
-                max_score = score
-                best_move = move
-        
-        if best_move:
-            if self.debug:
-                print(f"Choosing best attack: {best_move.id}")
-            return best_move
-        
-        return None
-    
-
     def score_switch(self, pokemon: Pokemon, state) -> float:
         opponent = state["opponent_pokemon"]
         if pokemon.fainted:
             return -float("inf")
-
         score = 100.0
-
-        # Offensive score: How well can this Pokemon threaten the opponent?
         offensive_multiplier = 0
-        for move_type in pokemon.types:
-            offensive_multiplier = max(offensive_multiplier, opponent.damage_multiplier(move_type))
-        
-        if offensive_multiplier > 1:
-            score += 150 * offensive_multiplier
-        elif offensive_multiplier < 1:
-            score -= 50
-
-        # Defensive score: How well can this Pokemon take a hit?
+        if pokemon.types:
+            for move_type in pokemon.types:
+                offensive_multiplier = max(offensive_multiplier, opponent.damage_multiplier(move_type))
+        if offensive_multiplier > 1: score += 150 * offensive_multiplier
+        elif offensive_multiplier < 1: score -= 50
         defensive_multiplier = 0
-        for opp_type in opponent.types:
-             defensive_multiplier = max(defensive_multiplier, pokemon.damage_multiplier(opp_type))
-
-        if defensive_multiplier == 0: # Immunity
-            score += 300
-        elif defensive_multiplier < 1: # Resistance
-            score += 200
-        elif defensive_multiplier > 1: # Weakness
-            score -= 400
-        
-        # Hazard damage penalty
+        if opponent.types:
+            for opp_type in opponent.types:
+                defensive_multiplier = max(defensive_multiplier, pokemon.damage_multiplier(opp_type))
+        if defensive_multiplier == 0: score += 300
+        elif defensive_multiplier < 1: score += 200
+        elif defensive_multiplier > 1: score -= 400
         sr_dmg = pokemon.damage_multiplier(PokemonType.ROCK) * 0.125
-        is_grounded = True
-        if PokemonType.FLYING in pokemon.types:
-            is_grounded = False
-        if pokemon.ability and "levitate" in pokemon.ability.lower():
-            is_grounded = False
-        if pokemon.item and "airballoon" in pokemon.item.lower():
-            is_grounded = False
+        is_grounded = PokemonType.FLYING not in pokemon.types and pokemon.ability != "levitate" and pokemon.item != "airballoon"
         spikes_dmg = 0
         if is_grounded:
-            spikes_dmg = [0, 1/8, 1/6, 1/4][self.hazards_set["spikes"]]
-        
+            spikes_layers = state["opponent_side_conditions"].get(SideCondition.SPIKES, 0)
+            spikes_dmg = [0, 1/8, 1/6, 1/4][spikes_layers]
         total_hazard_dmg_fraction = sr_dmg + spikes_dmg
         if pokemon.current_hp_fraction <= total_hazard_dmg_fraction:
-             return -float("inf") # This switch is a KO, avoid at all costs
-        
-        score -= total_hazard_dmg_fraction * 200 # Penalize based on hazard damage taken
+             return -float("inf")
+        score -= total_hazard_dmg_fraction * 200
 
-        # Sun bonus for Protosynthesis/Orichalcum Pulse
-        if self.sun_active and (pokemon.ability == "Protosynthesis" or pokemon.ability == "Orichalcum Pulse"):
+        sun_active = self.is_sun_active(state["weather"])
+        if sun_active and pokemon.ability and ("protosynthesis" in pokemon.ability.lower() or "orichal" in pokemon.ability.lower()):
             score += 75
-
-        # Health modifier: prefer switching in healthier Pokemon
         score *= pokemon.current_hp_fraction
-
         return score
-
 
     def choose_best_switch(self, state) -> Optional[Pokemon]:
         best_switch = None
         max_score = -float("inf")
-
         if not state["available_switches"]:
             return None
-
         for pokemon in state["available_switches"]:
             score = self.score_switch(pokemon, state)
-            if self.debug:
-                print(f"Debug: Switch score for {pokemon.species}: {score:.2f}")
+            if self.debug: print(f"Debug: Switch score for {pokemon.species}: {score:.2f}")
             if score > max_score:
                 max_score = score
                 best_switch = pokemon
-        
-        if self.debug and best_switch:
-            print(f"Debug: Best switch chosen is {best_switch.species} with score {max_score:.2f}")
-        
+        if self.debug and best_switch: print(f"Debug: Best switch chosen is {best_switch.species} with score {max_score:.2f}")
         return best_switch
-    
-    
-    def teampreview(self, battle: AbstractBattle) -> str:
 
-        deoxys_position = None
-        # Find the position of Deoxys-Speed in your team list
-        for i, p in enumerate(battle.team.values()):
-            if "deoxys" in p.species.lower() and p.base_stats['spe'] == 180:
-                deoxys_position = i + 1
-                break
-        
-        # If found, construct the team order string to make it the lead
+    def choose_best_attack(self, state):
+        best_move = None
+        max_score = -float("inf")
+        if not state["available_moves"]: return None
+        for move in state["available_moves"]:
+            score = self.score_move(move, state)
+            if self.debug: print(f"Debug: Move score for {move.id}: {score:.2f}")
+            if score > max_score:
+                max_score = score
+                best_move = move
+        if best_move:
+            if self.debug: print(f"Choosing best attack: {best_move.id} with score {max_score:.2f}")
+            return best_move
+        return None
+
+    def teampreview(self, battle: AbstractBattle) -> str:
+        # Simple teampreview: lead with Deoxys-Speed
+        deoxys_position = next((i + 1 for i, p in enumerate(battle.team.values()) if "deoxysspeed" in p.species), None)
         if deoxys_position:
             team_order = [str(deoxys_position)]
-            for i in range(1, len(battle.team) + 1):
-                if i != deoxys_position:
-                    team_order.append(str(i))
-            print(f"Debug: Teampreview order: {team_order}")
+            team_order.extend([str(i) for i in range(1, len(battle.team) + 1) if i != deoxys_position])
             return "/team " + "".join(team_order)
-
-        # Fallback if Deoxys-Speed is not found for some reason
-        return "/team " + "".join(str(i) for i in range(1, len(battle.team) + 1))
-
+        return super().teampreview(battle)
 
     def choose_move(self, battle: AbstractBattle):
         self.update_game_state(battle)
         state = self.get_battle_state(battle)
         self.tera_move = False
-        if battle.turn == 0:
-            return self.teampreview(battle)
 
         if self.debug:
-            print(f"=== Turn {battle.turn} - Phase: {self.game_phase} ===")
-            print(f"Active: {state['my_pokemon'].species} vs {state['opponent_pokemon'].species}")
-            print("Available moves:", [move.id for move in battle.available_moves])
-            print(f"Hazards: {self.hazards_set}, Sun: {self.sun_active}")
-        
+            print(f"\n=== Turn {battle.turn} - Phase: {self.game_phase} ===")
+            print(f"Active: {state['my_pokemon'].species} ({state['my_pokemon'].current_hp_fraction:.2%}) vs {state['opponent_pokemon'].species} ({state['opponent_pokemon'].current_hp_fraction:.2%})")
+
+        # Priority 1: Check for a winning move that overrides everything
+        if state["available_moves"]:
+            winning_move = self.has_winning_move(state)
+            if winning_move:
+                if self.debug:
+                    print(f"Debug: Found a winning move: {winning_move.id}. OVERRIDING ALL LOGIC.")
+                return self.create_order(winning_move)
+
         action = None
         if not battle.available_moves:
-            if self.debug:
-                print("Debug: No moves available, must switch.")
+            if self.debug: print("Debug: No moves available, must switch.")
+            action = self.choose_best_switch(state)
+        elif state["my_pokemon"].current_hp_fraction <= 0.4 or self.is_bad_matchup(state["my_pokemon"], state["opponent_pokemon"]):
             action = self.choose_best_switch(state)
         else:
             if self.game_phase == "early":
-                action = self.choose_early_game_action(state)
+                action = self.choose_early_game_action(battle, state)
             elif self.game_phase == "mid":
                 action = self.choose_mid_game_action(state)
-            else:  # late game
+            else:
                 action = self.choose_late_game_action(battle, state)
-
-        print(f"Debug: Chosen action: {action}" if action else "None")
+        
         if not action and state["available_switches"]:
-            print("Debug: No action chosen, switching")
+            if self.debug: print("Debug: No suitable move found or switch is preferred, calculating best switch.")
             action = self.choose_best_switch(state)
+        
+        if not action:
+            if self.debug: print("Debug: CRITICAL FALLBACK - Choosing random move.")
+            return self.choose_random_move(battle)
+        
+        if self.debug: print(f"Debug: Final action is: {action} {'(TERA)' if self.tera_move else ''}")
         if action:
             if self.tera_move == True:
+                self.tera_move = False
                 return self.create_order(action, terastallize=True)
             else:
                 return self.create_order(action)
         else:
+            if self.debug: print("Debug: No action determined, choosing random move as last resort.")
             return self.choose_random_move(battle)
