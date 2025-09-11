@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 from poke_env.battle import AbstractBattle, Move, Pokemon, PokemonType, SideCondition, Weather,MoveCategory
 from poke_env.player import Player
 
@@ -528,7 +528,12 @@ class CustomAgent(Player):
         if not battle.available_moves:
             if self.debug: print("Debug: No moves available, must switch.")
             action = self.choose_best_switch(state)
-        elif state["my_pokemon"].current_hp_fraction <= 0.4 or self.is_bad_matchup(state["my_pokemon"], state["opponent_pokemon"]):
+        #if self.debug: print(f"Debug: Current HP fraction: {state['my_pokemon'].current_hp_fraction}")
+        elif state["my_pokemon"].current_hp_fraction <= 0.4:
+            if self.debug: print("Debug: Low HP detected, evaluating switch options.")
+            action = self.choose_best_switch(state)
+        elif self.is_bad_matchup(state["my_pokemon"], state["opponent_pokemon"]):
+            if self.debug: print("Debug: Bad matchup detected, evaluating switch options.")
             action = self.choose_best_switch(state)
         else:
             if self.game_phase == "early":
