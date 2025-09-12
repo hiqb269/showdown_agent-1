@@ -80,10 +80,13 @@ class CustomAgent(Player):
         if move.base_power == 0:
             return 0
         
-        multiplier = defender.damage_multiplier(move)
+        if defender is None or defender.fainted:
+            multiplier = 1.0
+        else:
+            multiplier = defender.damage_multiplier(move)
         
         if move.type in attacker.types:
-            multiplier *= 1.5
+            multiplier *= 1.5 # STAB
             
         damage = move.base_power * multiplier
         return damage
@@ -106,7 +109,7 @@ class CustomAgent(Player):
                     best_move = move
             
         return best_move, max_damage
-
+    #same function as above - with just difference in order of parameters
     def _find_opponent_best_move(self, battle: AbstractBattle):
         """
         Estimates the opponent's best damaging move against our active Pokemon.
@@ -132,12 +135,12 @@ class CustomAgent(Player):
 
         if not battle.available_switches:
             return None
-
+        #resistance score is how much damage the switch-in can resist from the all of opponent's moves
         for pokemon in battle.available_switches:
             resistance_score = 0
             for move in battle.opponent_active_pokemon.moves.values():
                  resistance_score -= self._estimate_damage(move, battle.opponent_active_pokemon, pokemon)
-
+            #offensive score is how much damage the switch-in can deal to the opponent with its best move
             offensive_score = 0
             for move in pokemon.moves.values():
                 offensive_score = max(offensive_score, self._estimate_damage(move, pokemon, battle.opponent_active_pokemon))
@@ -145,7 +148,7 @@ class CustomAgent(Player):
             total_score = resistance_score + offensive_score
             
             if total_score > best_score:
-                best_score = total_score
+                best_score = total_score #simplistic
                 best_switch = pokemon
         
         return best_switch
@@ -172,32 +175,27 @@ class CustomAgent(Player):
             if best_switch:
                 return self.create_order(best_switch)
 
-        # Rule 3: Check for setup opportunities (if we predict a switch)
-        #if best_move and opponent.damage_multiplier(best_move) >= 2:
-        #    if active.species == "Arceus" and "stealthrock" in [m.id for m in battle.available_moves]:
-        #        if not battle.opponent_side_conditions.get('stealthrock'):
-        #            return self.create_order(Move('stealthrock', gen=battle.gen))
-        #    if active.species == "Chien-Pao" and "swordsdance" in [m.id for m in battle.available_moves]:
-        #        return self.create_order(Move('swordsdance', gen=battle.gen))
-
-        # Rule 4: Use strategic healing moves if health is low
+        # Rule 3: Use strategic healing moves if health is low
         if active.current_hp_fraction < 0.5:
             healing_moves = ['morningsun', 'recover']
-            print("Debug: Healing moves available:", [m.id for m in battle.available_moves if m.id in healing_moves])
             for move_id in healing_moves:
                 if move_id in [m.id for m in battle.available_moves]:
                     return self.create_order(Move(move_id, gen=battle.gen))
+            #switch if no healing move available
+            if battle.available_switches:
+                best_switch = self.find_best_switch(battle)
+                if best_switch:
+                    return self.create_order(best_switch)
 
-        # Rule 5: None available for the current teamm
+        # Rule 4: None available for the current team - keeping in case team changes
         pivoting_moves = ['uturn', 'voltswitch']
-        print("Debug: Pivoting moves available:", [m.id for m in battle.available_moves if m.id in pivoting_moves])
         for move_id in pivoting_moves:
             if move_id in [m.id for m in battle.available_moves]:
                 return self.create_order(Move(move_id, gen=battle.gen))
 
-        # Rule 6: If no other rule applies, use the best damaging move
+        # Rule 5: If no other rule applies, use the best damaging move
         if best_move:
             return self.create_order(best_move)
 
-        # Rule 7: Failsafe
+        # Rule 6: Failsafe
         return self.choose_random_move(battle)
