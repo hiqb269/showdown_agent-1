@@ -66,48 +66,138 @@ IVs: 0 Atk
 """
 
 class CustomAgent(Player):
+    """
+    An expert system agent for Pokémon battles.
+    This version uses a more advanced set of heuristics to make decisions.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(team=team, *args, **kwargs)
-        self.opponent_team_seen = set()
 
-    def get_battle_state(self, battle: AbstractBattle):
-        return {
-            "my_pokemon": battle.active_pokemon,
-            "opponent_pokemon": battle.opponent_active_pokemon,
-            "available_moves": battle.available_moves,
-            "available_switches": battle.available_switches,
-            "opponent_team": battle.opponent_team,
-    }
+    def _estimate_damage(self, move: Move, attacker: Pokemon, defender: Pokemon) -> float:
+        """
+        Estimates the damage a move would deal.
+        """
+        if move.base_power == 0:
+            return 0
+        
+        multiplier = defender.damage_multiplier(move)
+        
+        if move.type in attacker.types:
+            multiplier *= 1.5
+            
+        damage = move.base_power * multiplier
+        return damage
 
-    def update_opponent_model(self, battle):
-        opp_name = battle.opponent_active_pokemon.species
-        self.opponent_team_seen.add(opp_name)
-
-    def score_move(self, move: Move, opponent: Pokemon):
-        score = 0
-        score = opponent.damage_multiplier(move)
-        return score
-    
-    def choose_action(self, battle):
-        self.update_opponent_model(battle)
-        state = self.get_battle_state(battle)
-
+    def find_best_move(self, battle: AbstractBattle):
+        """
+        Finds the best damaging move to use, returning the move and its estimated damage.
+        """
         best_move = None
-        max_score = -float("inf")
+        max_damage = -1
 
-        for move in state["available_moves"]:
-            score = self.score_move(move, state["opponent_pokemon"])
-            if score > max_score:
-                max_score = score
-                best_move = move
+        if not battle.available_moves:
+            return None, 0
 
-        if best_move:
-            return self.create_order(best_move)
-        elif state["available_switches"]:
-            # If no good move is found, switch to a different Pokémon - we just pick the first available one
-            return self.create_order(state["available_switches"][0])
-        else:
-            return self.choose_random_move(battle)
+        for move in battle.available_moves:
+            if move.base_power > 0:
+                damage = self._estimate_damage(move, battle.active_pokemon, battle.opponent_active_pokemon)
+                if damage > max_damage:
+                    max_damage = damage
+                    best_move = move
+            
+        return best_move, max_damage
+
+    def _find_opponent_best_move(self, battle: AbstractBattle):
+        """
+        Estimates the opponent's best damaging move against our active Pokemon.
+        """
+        best_move = None
+        max_damage = -1
+
+        for move in battle.opponent_active_pokemon.moves.values():
+            if move.base_power > 0:
+                damage = self._estimate_damage(move, battle.opponent_active_pokemon, battle.active_pokemon)
+                if damage > max_damage:
+                    max_damage = damage
+                    best_move = move
+        
+        return best_move, max_damage
+
+    def find_best_switch(self, battle: AbstractBattle):
+        """
+        Finds the best Pokémon to switch into based on a matchup score.
+        """
+        best_switch = None
+        best_score = -float('inf')
+
+        if not battle.available_switches:
+            return None
+
+        for pokemon in battle.available_switches:
+            resistance_score = 0
+            for move in battle.opponent_active_pokemon.moves.values():
+                 resistance_score -= self._estimate_damage(move, battle.opponent_active_pokemon, pokemon)
+
+            offensive_score = 0
+            for move in pokemon.moves.values():
+                offensive_score = max(offensive_score, self._estimate_damage(move, pokemon, battle.opponent_active_pokemon))
+
+            total_score = resistance_score + offensive_score
+            
+            if total_score > best_score:
+                best_score = total_score
+                best_switch = pokemon
+        
+        return best_switch
     
     def choose_move(self, battle: AbstractBattle):
-         return self.choose_action(battle)
+        """
+        This is the main decision-making function that the game calls every turn.
+        """
+        active = battle.active_pokemon
+        opponent = battle.opponent_active_pokemon
+
+        if battle.force_switch:
+            best_switch = self.find_best_switch(battle)
+            return self.create_order(best_switch) if best_switch else self.choose_random_move(battle)
+
+        best_move, estimated_damage = self.find_best_move(battle)
+
+        # Rule 1: Check for a guaranteed knockout
+        if best_move and estimated_damage >= opponent.current_hp:
+            return self.create_order(best_move)
+
+        # Rule 2: Check if we are in immediate danger of being knocked out
+        _, opponent_damage = self._find_opponent_best_move(battle)
+        if opponent_damage >= active.current_hp and battle.available_switches:
+            best_switch = self.find_best_switch(battle)
+            if best_switch:
+                return self.create_order(best_switch)
+
+        # Rule 3: Check for setup opportunities (if we predict a switch)
+        if best_move and opponent.damage_multiplier(best_move) >= 2:
+            if active.species == "Arceus" and "stealthrock" in [m.id for m in battle.available_moves]:
+                if not battle.opponent_side_conditions.get('stealthrock'):
+                    return self.create_order(Move('stealthrock', gen=battle.gen))
+            if active.species == "Chien-Pao" and "swordsdance" in [m.id for m in battle.available_moves]:
+                return self.create_order(Move('swordsdance', gen=battle.gen))
+
+        # Rule 4: Use strategic healing moves if health is low
+        if active.current_hp_fraction < 0.5:
+            healing_moves = ['roost', 'recover']
+            for move_id in healing_moves:
+                if move_id in [m.id for m in battle.available_moves]:
+                    return self.create_order(Move(move_id, gen=battle.gen))
+
+        # Rule 5: Use a pivoting move for momentum
+        pivoting_moves = ['uturn', 'voltswitch']
+        for move_id in pivoting_moves:
+            if move_id in [m.id for m in battle.available_moves]:
+                return self.create_order(Move(move_id, gen=battle.gen))
+
+        # Rule 6: If no other rule applies, use the best damaging move
+        if best_move:
+            return self.create_order(best_move)
+
+        # Rule 7: Failsafe
+        return self.choose_random_move(battle)
