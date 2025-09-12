@@ -175,7 +175,7 @@ def run_swiss_round(
     for competitor in competitors:
         competitor.reset()
 
-    with open(results_file, "a", encoding="utf-8") as file:
+    with open(results_file, "w", encoding="utf-8") as file:
         file.write("Round\tGroup\tPlayer 1\tPlayer 2\tWinner\tBye\n")
         while True:
             # Get active players
@@ -238,7 +238,7 @@ def run_swiss_round(
     print("\nFinal Results:")
     final_sorted = sorted(competitors, key=lambda p: (-p.wins, p.losses, p.id))
 
-    with open(summary_file, "a", encoding="utf-8") as file:
+    with open(summary_file, "w", encoding="utf-8") as file:
         file.write("Player\tWins\tLosses 1\tStatus\n")
         for competitor in final_sorted:
             status = (
@@ -328,7 +328,7 @@ def run_swiss_phase(top_k: int, competitors: List[Competitor]):
         if not os.path.exists(os.path.dirname(results_file)):
             os.makedirs(os.path.dirname(results_file))
 
-        with open(results_file, "a", encoding="utf-8") as file:
+        with open(results_file, "w", encoding="utf-8") as file:
             file.write("---------------------------New set of results-------------------")  # This opens the file in write mode, clearing it
 
         summary_file = os.path.join(
@@ -341,7 +341,7 @@ def run_swiss_phase(top_k: int, competitors: List[Competitor]):
 
         #with open(summary_file, "w", encoding="utf-8") as file:
           #  pass  # This opens the file in write mode, clearing it
-        with open(summary_file, "a", encoding="utf-8") as file:
+        with open(summary_file, "w", encoding="utf-8") as file:
             file.write("---------------------------New set of results-------------------\n")  # This opens the file in write mode, clearing it
         cap = 3
 
@@ -389,14 +389,14 @@ def run_knockout_phase(players_ranked: list[Competitor]):
 
     #with open(results_file, "w", encoding="utf-8") as file:
     #    pass  # This opens the file in write mode, clearing it
-    with open(results_file, "a", encoding="utf-8") as file:
+    with open(results_file, "w", encoding="utf-8") as file:
             file.write("---------------------------New set of results-------------------\n")  # This opens the file in write mode, clearing it
 
     replay_dir = os.path.join(os.path.dirname(__file__), "replays")
     if not os.path.exists(replay_dir):
         os.makedirs(replay_dir)
 
-    with open(results_file, "a", encoding="utf-8") as file:
+    with open(results_file, "w", encoding="utf-8") as file:
         file.write("Top\tPlayer 1\tPlayer 2\tWinner\n")
 
         while len(current_round) > 1:
@@ -478,7 +478,7 @@ def main():
 
     players = gather_players()
 
-    run_competition(players, top_k=16)
+    run_competition(players, top_k=4)
 
 
 if __name__ == "__main__":

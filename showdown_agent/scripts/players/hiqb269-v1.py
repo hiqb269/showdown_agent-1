@@ -151,9 +151,7 @@ class CustomAgent(Player):
         return best_switch
     
     def choose_move(self, battle: AbstractBattle):
-        """
-        This is the main decision-making function that the game calls every turn.
-        """
+
         active = battle.active_pokemon
         opponent = battle.opponent_active_pokemon
 
@@ -175,22 +173,24 @@ class CustomAgent(Player):
                 return self.create_order(best_switch)
 
         # Rule 3: Check for setup opportunities (if we predict a switch)
-        if best_move and opponent.damage_multiplier(best_move) >= 2:
-            if active.species == "Arceus" and "stealthrock" in [m.id for m in battle.available_moves]:
-                if not battle.opponent_side_conditions.get('stealthrock'):
-                    return self.create_order(Move('stealthrock', gen=battle.gen))
-            if active.species == "Chien-Pao" and "swordsdance" in [m.id for m in battle.available_moves]:
-                return self.create_order(Move('swordsdance', gen=battle.gen))
+        #if best_move and opponent.damage_multiplier(best_move) >= 2:
+        #    if active.species == "Arceus" and "stealthrock" in [m.id for m in battle.available_moves]:
+        #        if not battle.opponent_side_conditions.get('stealthrock'):
+        #            return self.create_order(Move('stealthrock', gen=battle.gen))
+        #    if active.species == "Chien-Pao" and "swordsdance" in [m.id for m in battle.available_moves]:
+        #        return self.create_order(Move('swordsdance', gen=battle.gen))
 
         # Rule 4: Use strategic healing moves if health is low
         if active.current_hp_fraction < 0.5:
-            healing_moves = ['roost', 'recover']
+            healing_moves = ['morningsun', 'recover']
+            print("Debug: Healing moves available:", [m.id for m in battle.available_moves if m.id in healing_moves])
             for move_id in healing_moves:
                 if move_id in [m.id for m in battle.available_moves]:
                     return self.create_order(Move(move_id, gen=battle.gen))
 
-        # Rule 5: Use a pivoting move for momentum
+        # Rule 5: None available for the current teamm
         pivoting_moves = ['uturn', 'voltswitch']
+        print("Debug: Pivoting moves available:", [m.id for m in battle.available_moves if m.id in pivoting_moves])
         for move_id in pivoting_moves:
             if move_id in [m.id for m in battle.available_moves]:
                 return self.create_order(Move(move_id, gen=battle.gen))
