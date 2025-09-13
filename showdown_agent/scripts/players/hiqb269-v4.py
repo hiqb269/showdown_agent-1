@@ -9,17 +9,16 @@ from poke_env.battle.move import Move
 from poke_env.battle.pokemon_type import PokemonType
 from poke_env.player import Player
 
-#Similar team but with hazards and faster
 team = """
 Necrozma-Dusk-Mane @ Rocky Helmet  
 Ability: Prism Armor  
 Tera Type: Water  
-EVs: 252 HP / 252 Atk / 4 SpD  
-Adamant Nature  
+EVs: 252 HP / 252 Def / 4 SpD  
+Impish Nature  
 - Sunsteel Strike  
 - Earthquake  
-- Outrage  
-- Morning Sun
+- Stealth Rock  
+- Morning Sun  
 
 Koraidon @ Choice Band  
 Ability: Orichalcum Pulse  
@@ -28,18 +27,18 @@ EVs: 252 Atk / 4 SpD / 252 Spe
 Jolly Nature  
 - Flare Blitz  
 - Close Combat  
-- Outrage 
-- Iron Head
+- Outrage  
+- U-turn  
 
 Kyogre @ Choice Specs  
 Ability: Drizzle  
 Tera Type: Water  
-EVs: 252 HP / 252 SpA / 4 Spe  
-Hasty Nature  
+EVs: 252 SpA / 4 SpD / 252 Spe  
+Modest Nature  
 - Water Spout  
-- Rock Slide  
+- Origin Pulse  
 - Ice Beam  
-- Thunder 
+- Thunder  
 
 Zacian-Crowned @ Rusted Sword  
 Ability: Intrepid Sword  
@@ -49,17 +48,17 @@ Jolly Nature
 - Behemoth Blade  
 - Play Rough  
 - Close Combat  
-- Wild Charge
+- Wild Charge  
 
 Ho-Oh @ Heavy-Duty Boots  
 Ability: Regenerator  
 Tera Type: Flying  
-EVs: 4 HP / 252 Atk / 252 SpD  
+EVs: 248 HP / 200 SpD / 60 Atk  
 Careful Nature  
 - Sacred Fire  
 - Brave Bird  
 - Earthquake  
-- Recover 
+- Recover  
 
 Arceus-Ground @ Earth Plate  
 Ability: Multitype  
@@ -70,84 +69,408 @@ IVs: 0 Atk
 - Judgment  
 - Calm Mind  
 - Recover  
-- Ice Beam
+- Ice Beam  
 """
 
 # Only multipliers != 1.0 are listed to keep it compact; lookup defaults to 1.0.
 TYPE_CHART: Dict[str, Dict[str, float]] = {
-    "Normal": {"Rock": 0.5, "Ghost": 0.0, "Steel": 0.5},
-    "Fire": {"Fire": 0.5, "Water": 0.5, "Grass": 2.0, "Ice": 2.0, "Bug": 2.0, "Rock": 0.5, "Dragon": 0.5, "Steel": 2.0},
-    "Water": {"Fire": 2.0, "Water": 0.5, "Grass": 0.5, "Ground": 2.0, "Rock": 2.0, "Dragon": 0.5},
-    "Electric": {"Water": 2.0, "Electric": 0.5, "Grass": 0.5, "Ground": 0.0, "Flying": 2.0, "Dragon": 0.5},
-    "Grass": {"Fire": 0.5, "Water": 2.0, "Grass": 0.5, "Poison": 0.5, "Ground": 2.0, "Flying": 0.5, "Bug": 0.5, "Rock": 2.0, "Dragon": 0.5, "Steel": 0.5},
-    "Ice": {"Water": 0.5, "Grass": 2.0, "Ice": 0.5, "Ground": 2.0, "Flying": 2.0, "Dragon": 2.0, "Steel": 0.5, "Fire": 0.5},
-    "Fighting": {"Normal": 2.0, "Ice": 2.0, "Rock": 2.0, "Dark": 2.0, "Steel": 2.0, "Poison": 0.5, "Flying": 0.5, "Psychic": 0.5, "Bug": 0.5, "Fairy": 0.5, "Ghost": 0.0},
-    "Poison": {"Grass": 2.0, "Poison": 0.5, "Ground": 0.5, "Rock": 0.5, "Ghost": 0.5, "Steel": 0.0, "Fairy": 2.0},
-    "Ground": {"Fire": 2.0, "Electric": 2.0, "Grass": 0.5, "Poison": 2.0, "Flying": 0.0, "Bug": 0.5, "Rock": 2.0, "Steel": 2.0},
-    "Flying": {"Electric": 0.5, "Grass": 2.0, "Fighting": 2.0, "Bug": 2.0, "Rock": 0.5, "Steel": 0.5},
-    "Psychic": {"Fighting": 2.0, "Poison": 2.0, "Psychic": 0.5, "Steel": 0.5, "Dark": 0.0},
-    "Bug": {"Fire": 0.5, "Grass": 2.0, "Fighting": 0.5, "Poison": 0.5, "Flying": 0.5, "Psychic": 2.0, "Ghost": 0.5, "Dark": 2.0, "Steel": 0.5, "Fairy": 0.5},
-    "Rock": {"Fire": 2.0, "Ice": 2.0, "Flying": 2.0, "Bug": 2.0, "Fighting": 0.5, "Ground": 0.5, "Steel": 0.5},
-    "Ghost": {"Normal": 0.0, "Psychic": 2.0, "Ghost": 2.0, "Dark": 0.5},
-    "Dragon": {"Dragon": 2.0, "Steel": 0.5, "Fairy": 0.0},
-    "Dark": {"Fighting": 0.5, "Psychic": 2.0, "Ghost": 2.0, "Dark": 0.5, "Fairy": 0.5},
-    "Steel": {"Fire": 0.5, "Water": 0.5, "Electric": 0.5, "Ice": 2.0, "Rock": 2.0, "Fairy": 2.0, "Steel": 0.5},
-    "Fairy": {"Fire": 0.5, "Poison": 0.5, "Steel": 0.5, "Fighting": 2.0, "Dragon": 2.0, "Dark": 2.0},
+    "normal": {"rock": 0.5, "ghost": 0.0, "steel": 0.5},
+    "fire": {"fire": 0.5, "water": 0.5, "grass": 2.0, "ice": 2.0, "bug": 2.0, "rock": 0.5, "dragon": 0.5, "steel": 2.0},
+    "water": {"fire": 2.0, "water": 0.5, "grass": 0.5, "ground": 2.0, "rock": 2.0, "dragon": 0.5},
+    "electric": {"water": 2.0, "electric": 0.5, "grass": 0.5, "ground": 0.0, "flying": 2.0, "dragon": 0.5},
+    "grass": {"fire": 0.5, "water": 2.0, "grass": 0.5, "poison": 0.5, "ground": 2.0, "flying": 0.5, "bug": 0.5, "rock": 2.0, "dragon": 0.5, "steel": 0.5},
+    "ice": {"water": 0.5, "grass": 2.0, "ice": 0.5, "ground": 2.0, "flying": 2.0, "dragon": 2.0, "steel": 0.5, "fire": 0.5},
+    "fighting": {"normal": 2.0, "ice": 2.0, "rock": 2.0, "dark": 2.0, "steel": 2.0, "poison": 0.5, "flying": 0.5, "psychic": 0.5, "bug": 0.5, "fairy": 0.5, "ghost": 0.0},
+    "poison": {"grass": 2.0, "poison": 0.5, "ground": 0.5, "rock": 0.5, "ghost": 0.5, "steel": 0.0, "fairy": 2.0},
+    "ground": {"fire": 2.0, "electric": 2.0, "grass": 0.5, "poison": 2.0, "flying": 0.0, "bug": 0.5, "rock": 2.0, "steel": 2.0},
+    "flying": {"electric": 0.5, "grass": 2.0, "fighting": 2.0, "bug": 2.0, "rock": 0.5, "steel": 0.5},
+    "psychic": {"fighting": 2.0, "poison": 2.0, "psychic": 0.5, "steel": 0.5, "dark": 0.0},
+    "bug": {"fire": 0.5, "grass": 2.0, "fighting": 0.5, "poison": 0.5, "flying": 0.5, "psychic": 2.0, "ghost": 0.5, "dark": 2.0, "steel": 0.5, "fairy": 0.5},
+    "rock": {"fire": 2.0, "ice": 2.0, "flying": 2.0, "bug": 2.0, "fighting": 0.5, "ground": 0.5, "steel": 0.5},
+    "ghost": {"normal": 0.0, "psychic": 2.0, "ghost": 2.0, "dark": 0.5},
+    "dragon": {"dragon": 2.0, "steel": 0.5, "fairy": 0.0},
+    "dark": {"fighting": 0.5, "psychic": 2.0, "ghost": 2.0, "dark": 0.5, "fairy": 0.5},
+    "steel": {"fire": 0.5, "water": 0.5, "electric": 0.5, "ice": 2.0, "rock": 2.0, "fairy": 2.0, "steel": 0.5},
+    "fairy": {"fire": 0.5, "poison": 0.5, "steel": 0.5, "fighting": 2.0, "dragon": 2.0, "dark": 2.0},
 }
 
 
 # Common set priors (knowledge acquisition): predicted coverage for selected species
-COMMON_SETS: Dict[str, List[str]] = {
-    # Gen 9 Ubers box legends
-    "Koraidon": ["flareblitz", "closecombat", "dragonclaw", "uturn", "collisioncourse", "outrage"],
-    "Miraidon": ["electrodrift", "dracometeor", "voltswitch", "overheat", "calmmind", "paraboliccharge"],
+COMMON_SETS: Dict[str, List[Dict[str, str]]] = {
+    # Gen 9 Box Legends
+    "koraidon": [
+        {"name": "swordsdance", "type": "normal"},
+        {"name": "lowkick", "type": "fighting"},
+        {"name": "scaleshot", "type": "dragon"},
+        {"name": "closecombat", "type": "fighting"},
+        {"name": "dragonclaw", "type": "dragon"},
+        {"name": "flamecharge", "type": "fire"},
+        {"name": "wildcharge", "type": "electric"},
+        {"name": "uturn", "type": "bug"}
+    ],
+
+    "miridon": [
+        {"name": "electrodrift", "type": "electric"},
+        {"name": "dracometeor", "type": "dragon"},
+        {"name": "voltswitch", "type": "electric"},
+        {"name": "overheat", "type": "fire"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "paraboliccharge", "type": "electric"},
+        {"name": "terablast", "type": "normal"},
+        {"name": "dazzlinggleam", "type": "fairy"}
+    ],
 
     # Zacian (still Uber)
-    "Zacian-Crowned": ["behemothblade", "closecombat", "playrough", "wildcharge", "crunch"],
+    "zaciancrowned": [
+        {"name": "behemothblade", "type": "steel"},
+        {"name": "closecombat", "type": "fighting"},
+        {"name": "playrough", "type": "fairy"},
+        {"name": "wildcharge", "type": "electric"},
+        {"name": "crunch", "type": "dark"},
+        {"name": "swordsdance", "type": "normal"}
+    ],
 
-    # Common Paradox / Gen 9 Ubers bans
-    "Flutter Mane": ["shadowball", "moonblast", "calmmind", "substitute", "taunt"],
-    "Chi-Yu": ["overheat", "darkpulse", "taunt", "nastyplot", "terablast"],
-    "Chien-Pao": ["icespinner", "suckerpunch", "swordsdance", "sacredsword", "crunch"],
-    "Iron Bundle": ["hydropump", "freezedry", "flipturn", "icespinner", "taunt"],
-    "Palafin-Hero": ["wavecrash", "jetpunch", "flipturn", "taunt", "icepunch"],
+    # Major Paradox Pokemon
+    "flutter_mane": [
+        {"name": "shadowball", "type": "ghost"},
+        {"name": "moonblast", "type": "fairy"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "substitute", "type": "normal"},
+        {"name": "taunt", "type": "dark"},
+        {"name": "mysticalfire", "type": "fire"},
+        {"name": "psyshock", "type": "psychic"}
+    ],
 
-    # Ubers defensive staples (Gen 9 OU mons usable in Ubers)
-    "Great Tusk": ["headlongrush", "closecombat", "rapidspin", "knockoff", "icespinner"],
-    "Ting-Lu": ["ruination", "earthquake", "stealthrock", "whirlwind", "spikes"],
-    "Hatterene": ["drainingkiss", "psyshock", "mysticalfire", "calmmind"],
-    "Skeledirge": ["torchsong", "slackoff", "shadowball", "willowisp", "earthpower"],
-    "Garganacl": ["saltcure", "recover", "irondefense", "bodypress", "stealthrock"],
-    "Glimmora": ["mortalspin", "stealthrock", "earthpower", "sludgewave", "spikes"],
-    "Roaring Moon": ["dragonclaw", "acrobatic", "uturn", "jawlock", "dragondance"],
+    "chiyu": [
+        {"name": "overheat", "type": "fire"},
+        {"name": "darkpulse", "type": "dark"},
+        {"name": "taunt", "type": "dark"},
+        {"name": "nastyplot", "type": "dark"},
+        {"name": "terablast", "type": "normal"},
+        {"name": "flamethrower", "type": "fire"},
+        {"name": "psychic", "type": "psychic"}
+    ],
 
-    # Arceus forms (biggest staples in SV Ubers)
-    "Arceus-Normal": ["extremespeed", "swordsdance", "earthquake", "recover"],
-    "Arceus-Ghost": ["judgment", "calmmind", "recover", "focusblast"],
-    "Arceus-Dark": ["judgment", "calmmind", "recover", "earthpower"],
-    "Arceus-Grass": ["judgment", "toxic", "recover", "earthpower"],
-    "Arceus-Ground": ["judgment", "calmmind", "recover", "earthpower", "icebeam"],
-    "Arceus-Water": ["judgment", "toxic", "recover", "calmmind", "icebeam"],
-    "Arceus-Fairy": ["judgment", "calmmind", "recover", "earthpower", "moonblast"],
+    "chienpao": [
+        {"name": "icespinner", "type": "ice"},
+        {"name": "suckerpunch", "type": "dark"},
+        {"name": "swordsdance", "type": "normal"},
+        {"name": "sacredsword", "type": "fighting"},
+        {"name": "crunch", "type": "dark"},
+        {"name": "iciclecrash", "type": "ice"}
+    ],
 
-    # Legacy Ubers that are still staples
-    "Necrozma-Dusk-Mane": ["sunsteelstrike", "earthquake", "morningsun", "stealthrock", "dragonclaw"],
-    "Eternatus": ["sludgebomb", "flamethrower", "recover", "toxicspikes", "dynamaxcannon"],
-    "Calyrex-Shadow": ["astralbarrage", "psyshock", "nastyplot", "substitute", "drainingkiss"],
-    "Calyrex-Ice": ["glaciallance", "highhorsepower", "trickroom", "swordsdance"],
-    "Ho-Oh": ["sacredfire", "bravebird", "recover", "defog", "earthquake"],
-    "Lugia": ["toxic", "whirlwind", "recover", "icebeam", "aeroblast"],
-    "Giratina": ["dragontail", "toxic", "defog", "rest", "willowisp"],
-    "Giratina-Origin": ["dracometeor", "shadowball", "aurasphere", "defog"],
-    "Dialga-Origin": ["dracometeor", "flashcannon", "stealthrock", "fireblast"],
-    "Rayquaza": ["dragondance", "earthquake", "outrage", "extremespeed", "vcreate"],
-    "Darkrai": ["darkpulse", "nastyplot", "sludgebomb", "focusblast", "hypnosis"],
-    "Groudon": ["precipiceblades", "stealthrock", "stoneedge", "dragontail", "heatcrash"],
+    "ironbundle": [
+        {"name": "hydropump", "type": "water"},
+        {"name": "freezedry", "type": "ice"},
+        {"name": "flipturn", "type": "water"},
+        {"name": "icespinner", "type": "ice"},
+        {"name": "taunt", "type": "dark"},
+        {"name": "icebeam", "type": "ice"}
+    ],
 
-    # Primals/Restricted legends still legal in NatDex Ubers
-    "Kyogre": ["waterspout", "thunder", "icebeam", "originpulse", "calmmind", "surf"],
+    "palafinhero": [
+        {"name": "wavecrash", "type": "water"},
+        {"name": "jetpunch", "type": "water"},
+        {"name": "flipturn", "type": "water"},
+        {"name": "taunt", "type": "dark"},
+        {"name": "icepunch", "type": "ice"},
+        {"name": "closecombat", "type": "fighting"}
+    ],
+
+    # New Gen 9 Threats
+    "ogerponhearthflame": [
+        {"name": "ivycudgel", "type": "fire"},
+        {"name": "playrough", "type": "fairy"},
+        {"name": "trailblaze", "type": "grass"},
+        {"name": "swordsdance", "type": "normal"},
+        {"name": "uturn", "type": "bug"},
+        {"name": "hornleech", "type": "grass"}
+    ],
+
+    "kingambit": [
+        {"name": "suckerpunch", "type": "dark"},
+        {"name": "kowtowcleave", "type": "dark"},
+        {"name": "ironhead", "type": "steel"},
+        {"name": "lowkick", "type": "fighting"},
+        {"name": "swordsdance", "type": "normal"},
+        {"name": "zenheadbutt", "type": "psychic"}
+    ],
+
+    # Important Support/Defensive Pokemon
+    "grimmsnarl": [
+        {"name": "reflect", "type": "psychic"},
+        {"name": "lightscreen", "type": "psychic"},
+        {"name": "spiritbreak", "type": "fairy"},
+        {"name": "taunt", "type": "dark"},
+        {"name": "thunderwave", "type": "electric"},
+        {"name": "partingshot", "type": "dark"}
+    ],
+
+    "toxapex": [
+        {"name": "recover", "type": "normal"},
+        {"name": "scald", "type": "water"},
+        {"name": "toxic", "type": "poison"},
+        {"name": "haze", "type": "ice"},
+        {"name": "toxicspikes", "type": "poison"},
+        {"name": "knockoff", "type": "dark"}
+    ],
+
+    "dondozo": [
+        {"name": "liquidation", "type": "water"},
+        {"name": "earthquake", "type": "ground"},
+        {"name": "rest", "type": "psychic"},
+        {"name": "sleeptalk", "type": "normal"},
+        {"name": "curse", "type": "ghost"},
+        {"name": "bodyslam", "type": "normal"}
+    ],
+
+    # Gen 9 OU Mons Viable in Ubers
+    "greattusk": [
+        {"name": "headlongrush", "type": "ground"},
+        {"name": "closecombat", "type": "fighting"},
+        {"name": "rapidspin", "type": "normal"},
+        {"name": "knockoff", "type": "dark"},
+        {"name": "icespinner", "type": "ice"},
+        {"name": "earthquake", "type": "ground"}
+    ],
+
+    "tinglu": [
+        {"name": "ruination", "type": "dark"},
+        {"name": "earthquake", "type": "ground"},
+        {"name": "stealthrock", "type": "rock"},
+        {"name": "whirlwind", "type": "normal"},
+        {"name": "spikes", "type": "ground"},
+        {"name": "rest", "type": "psychic"}
+    ],
+
+    "hatterene": [
+        {"name": "drainingkiss", "type": "fairy"},
+        {"name": "psyshock", "type": "psychic"},
+        {"name": "mysticalfire", "type": "fire"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "psychic", "type": "psychic"},
+        {"name": "trickroom", "type": "psychic"}
+    ],
+
+    "skeledirge": [
+        {"name": "torchsong", "type": "fire"},
+        {"name": "slackoff", "type": "normal"},
+        {"name": "shadowball", "type": "ghost"},
+        {"name": "willowisp", "type": "fire"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "terablast", "type": "normal"}
+    ],
+
+    "garganacl": [
+        {"name": "saltcure", "type": "rock"},
+        {"name": "recover", "type": "normal"},
+        {"name": "irondefense", "type": "steel"},
+        {"name": "bodypress", "type": "fighting"},
+        {"name": "stealthrock", "type": "rock"},
+        {"name": "earthquake", "type": "ground"}
+    ],
+
+    "glimmora": [
+        {"name": "mortalspin", "type": "poison"},
+        {"name": "stealthrock", "type": "rock"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "sludgewave", "type": "poison"},
+        {"name": "spikes", "type": "ground"},
+        {"name": "powergemm", "type": "rock"}
+    ],
+
+    "roaringmoon": [
+        {"name": "dragonclaw", "type": "dragon"},
+        {"name": "acrobatics", "type": "flying"},
+        {"name": "uturn", "type": "bug"},
+        {"name": "earthquake", "type": "ground"},
+        {"name": "dragondance", "type": "dragon"},
+        {"name": "crunch", "type": "dark"}
+    ],
+
+    # Arceus Forms (Major Ubers Staples)
+    "arceusnormal": [
+        {"name": "judgment", "type": "normal"},
+        {"name": "swordsdance", "type": "normal"},
+        {"name": "earthquake", "type": "ground"},
+        {"name": "recover", "type": "normal"},
+        {"name": "extremespeed", "type": "normal"},
+        {"name": "shadowclaw", "type": "ghost"}
+    ],
+
+    "arceusghost": [
+        {"name": "judgment", "type": "ghost"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "recover", "type": "normal"},
+        {"name": "focusblast", "type": "fighting"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "willowisp", "type": "fire"}
+    ],
+
+    "arceusdark": [
+        {"name": "judgment", "type": "dark"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "recover", "type": "normal"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "focusblast", "type": "fighting"},
+        {"name": "taunt", "type": "dark"}
+    ],
+
+    "arceusgrass": [
+        {"name": "judgment", "type": "grass"},
+        {"name": "toxic", "type": "poison"},
+        {"name": "recover", "type": "normal"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "icebeam", "type": "ice"}
+    ],
+
+    "arceusground": [
+        {"name": "judgment", "type": "ground"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "recover", "type": "normal"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "icebeam", "type": "ice"},
+        {"name": "stoneedge", "type": "rock"}
+    ],
+
+    "arceuswater": [
+        {"name": "judgment", "type": "water"},
+        {"name": "toxic", "type": "poison"},
+        {"name": "recover", "type": "normal"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "icebeam", "type": "ice"},
+        {"name": "earthpower", "type": "ground"}
+    ],
+
+    "arceusfairy": [
+        {"name": "judgment", "type": "fairy"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "recover", "type": "normal"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "focusblast", "type": "fighting"},
+        {"name": "toxic", "type": "poison"}
+    ],
+
+    # Legacy Ubers Still Meta
+    "necrozmaduskmane": [
+        {"name": "sunsteelstrike", "type": "steel"},
+        {"name": "earthquake", "type": "ground"},
+        {"name": "morningsun", "type": "normal"},
+        {"name": "stealthrock", "type": "rock"},
+        {"name": "dragonclaw", "type": "dragon"},
+        {"name": "stoneedge", "type": "rock"}
+    ],
+
+    "eternatus": [
+        {"name": "sludgebomb", "type": "poison"},
+        {"name": "flamethrower", "type": "fire"},
+        {"name": "recover", "type": "normal"},
+        {"name": "toxicspikes", "type": "poison"},
+        {"name": "dynamaxcannon", "type": "dragon"},
+        {"name": "toxic", "type": "poison"}
+    ],
+
+    "calyrexshadow": [
+        {"name": "astralbarrage", "type": "ghost"},
+        {"name": "psyshock", "type": "psychic"},
+        {"name": "nastyplot", "type": "dark"},
+        {"name": "substitute", "type": "normal"},
+        {"name": "drainingkiss", "type": "fairy"},
+        {"name": "psychic", "type": "psychic"}
+    ],
+
+    "calyrexice": [
+        {"name": "glaciallance", "type": "ice"},
+        {"name": "highhorsepower", "type": "ground"},
+        {"name": "trickroom", "type": "psychic"},
+        {"name": "swordsdance", "type": "normal"},
+        {"name": "closecombat", "type": "fighting"},
+        {"name": "zenheadbutt", "type": "psychic"}
+    ],
+
+    "hooh": [
+        {"name": "sacredfire", "type": "fire"},
+        {"name": "bravebird", "type": "flying"},
+        {"name": "recover", "type": "normal"},
+        {"name": "defog", "type": "flying"},
+        {"name": "earthquake", "type": "ground"},
+        {"name": "toxic", "type": "poison"}
+    ],
+
+    "lugia": [
+        {"name": "toxic", "type": "poison"},
+        {"name": "whirlwind", "type": "normal"},
+        {"name": "recover", "type": "normal"},
+        {"name": "icebeam", "type": "ice"},
+        {"name": "aeroblast", "type": "flying"},
+        {"name": "psychic", "type": "psychic"}
+    ],
+
+    "giratina": [
+        {"name": "dragontail", "type": "dragon"},
+        {"name": "toxic", "type": "poison"},
+        {"name": "defog", "type": "flying"},
+        {"name": "rest", "type": "psychic"},
+        {"name": "willowisp", "type": "fire"},
+        {"name": "shadowball", "type": "ghost"}
+    ],
+
+    "giratinaorigin": [
+        {"name": "dracometeor", "type": "dragon"},
+        {"name": "shadowball", "type": "ghost"},
+        {"name": "aurasphere", "type": "fighting"},
+        {"name": "defog", "type": "flying"},
+        {"name": "hex", "type": "ghost"},
+        {"name": "willowisp", "type": "fire"}
+    ],
+
+    "dialgaorigin": [
+        {"name": "dracometeor", "type": "dragon"},
+        {"name": "flashcannon", "type": "steel"},
+        {"name": "stealthrock", "type": "rock"},
+        {"name": "fireblast", "type": "fire"},
+        {"name": "earthpower", "type": "ground"},
+        {"name": "toxic", "type": "poison"}
+    ],
+
+    "rayquaza": [
+        {"name": "dragondance", "type": "dragon"},
+        {"name": "earthquake", "type": "ground"},
+        {"name": "outrage", "type": "dragon"},
+        {"name": "extremespeed", "type": "normal"},
+        {"name": "vcreate", "type": "fire"},
+        {"name": "dragonclaw", "type": "dragon"}
+    ],
+
+    "darkrai": [
+        {"name": "darkpulse", "type": "dark"},
+        {"name": "nastyplot", "type": "dark"},
+        {"name": "sludgebomb", "type": "poison"},
+        {"name": "focusblast", "type": "fighting"},
+        {"name": "hypnosis", "type": "psychic"},
+        {"name": "substitute", "type": "normal"}
+    ],
+
+    "groudon": [
+        {"name": "precipiceblades", "type": "ground"},
+        {"name": "stealthrock", "type": "rock"},
+        {"name": "stoneedge", "type": "rock"},
+        {"name": "dragontail", "type": "dragon"},
+        {"name": "heatcrash", "type": "fire"},
+        {"name": "toxic", "type": "poison"}
+    ],
+
+    "kyogre": [
+        {"name": "waterspout", "type": "water"},
+        {"name": "thunder", "type": "electric"},
+        {"name": "icebeam", "type": "ice"},
+        {"name": "originpulse", "type": "water"},
+        {"name": "calmmind", "type": "psychic"},
+        {"name": "surf", "type": "water"}
+    ]
 }
-
 
 
 
@@ -164,6 +487,9 @@ def predict_effectiveness(atk_type: Optional[str], def_types: List[str]) -> floa
     if not atk_type or not def_types:
         return 1.0
     mult = 1.0
+    # Ensure atk_type and def_types are lowercase for lookup
+    atk_type = atk_type.lower() if atk_type else atk_type
+    def_types = [dt.lower() for dt in def_types]
     chart_row = TYPE_CHART.get(atk_type, {})
     for dt in def_types:
         mult *= chart_row.get(dt, 1.0)
@@ -178,24 +504,11 @@ def effectiveness(move: Move, defender: Pokemon) -> float:
     return mult
 
 
-def has_stab(move: Move, attacker: Pokemon) -> bool:
-    if not move.type:
+def has_stab(move_type: str, attacker: Pokemon) -> bool:
+    if not move_type:
         return False
-    move_type = move.type.name if hasattr(move.type, "name") else str(move.type)
     return move_type in attacker.types
 
-
-def approx_speed(p: Pokemon) -> int:
-    # EV/IV unknown: assume max speed if fast archetype, else neutral
-    base = float(getattr(p, "base_speed", 0) or 0)
-    #base = BASE_SPEED.get(p.species, 80)
-    # Rough boost handling
-    boost = p.boosts.get("spe", 0) if p.boosts else 0
-    # +1 ~ x1.5, -1 ~ x0.67; we translate to an integer multiplier
-    mult = { -6: 2/8, -5: 2/7, -4: 2/6, -3: 2/5, -2: 2/4, -1: 2/3,
-              0: 1.0, 1: 3/2, 2: 4/2, 3: 5/2, 4: 6/2, 5: 7/2, 6: 8/2 }.get(boost, 1.0)
-    #TODO: account for items/abilities that modify speed
-    return int(base * mult)
 
 def estimate_speed(pokemon):
     base_speed = pokemon.base_stats.get('spe', 0)
@@ -230,14 +543,7 @@ def estimate_speed(pokemon):
 
 
 def is_first_one_faster(p1: Pokemon, p2: Pokemon) -> bool:
-    #return approx_speed(p1) > approx_speed(p2)
     return estimate_speed(p1) > estimate_speed(p2)
-
-
-def current_hp_fraction(p: Pokemon) -> float:
-    if p.max_hp == 0:
-        return 1.0
-    return max(0.0, min(1.0, p.current_hp / p.max_hp))
 
 
 def pokemon_types(p: Pokemon) -> List[str]:
@@ -284,77 +590,48 @@ class OpponentModel:
     def __init__(self):
         # species -> set of revealed moves
         self.revealed: Dict[str, set] = {}
-        # species -> plausible moves (start with priors)
-        self.plausible: Dict[str, set] = {}
+        self.plausible:Dict[str, List[Dict[str, str]]] = {}
 
     def update_with_battle(self, battle: AbstractBattle):
+
         opp = battle.opponent_active_pokemon
         if not opp:
             return
         # Add the opponent to the model if not already present
         if opp.species not in self.revealed:
             self.revealed[opp.species] = set()
-            self.plausible[opp.species] = set(COMMON_SETS.get(opp.species, []))  # should fill like this or not?
+            # Fill plausible with a list of moves (dicts with name/type) from COMMON_SETS if available
+            if opp.species not in self.plausible:
+                common_moves = COMMON_SETS.get(opp.species, [])
+                self.plausible[opp.species] = [dict(m) for m in common_moves]
 
         # Add revealed moves if present
         for m in opp.moves.values():
             if m and m.id:
                 self.revealed[opp.species].add(m.id)
                 # Keep plausible set in sync
-                if m.id not in self.plausible[opp.species]:
-                    self.plausible[opp.species].add(m.id)
+                if any(m.id == move_dict['name'] for move_dict in self.plausible[opp.species]):
+                    self.plausible[opp.species] = [move_dict for move_dict in self.plausible[opp.species] if move_dict['name'] != m.id]
 
-    def likely_strong_moves(self, species: str, defender: Pokemon) -> List[str]:
-        # Rank plausible moves by predicted effectiveness vs defender
-        moves = list(self.plausible.get(species, []))
-        if not defender or not moves:
-            return []
-        ranked = []
-        for move_id in moves:
-            # Fake Move-like object for type lookup; we only want type-effectiveness guess
-            # Without a full dex, infer type from common move names (minimal heuristic)
-            # You can expand this mapping for better predictions.
-            name_lower = move_id.lower()
-            guessed_type = None
-            # Simple keywords to type mapping (extend over time)
-            if "draco" in name_lower or "dragon" in name_lower:
-                guessed_type = "Dragon"
-            elif "electro" in name_lower or "volt" in name_lower or "thunder" in name_lower or "charge" in name_lower:
-                guessed_type = "Electric"
-            elif "flare" in name_lower or "overheat" in name_lower or "fire" in name_lower or "blitz" in name_lower:
-                guessed_type = "Fire"
-            elif "earth" in name_lower or "quake" in name_lower or "headlong" in name_lower:
-                guessed_type = "Ground"
-            elif "play" in name_lower or "kiss" in name_lower or "gleam" in name_lower or "fairy" in name_lower:
-                guessed_type = "Fairy"
-            elif "close combat" in name_lower or "collision" in name_lower or "low kick" in name_lower:
-                guessed_type = "Fighting"
-            elif "psy" in name_lower:
-                guessed_type = "Psychic"
-            elif "shadow" in name_lower or "hex" in name_lower:
-                guessed_type = "Ghost"
-            elif "hydro" in name_lower or "surf" in name_lower or "water" in name_lower:
-                guessed_type = "Water"
-            elif "leaf" in name_lower or "grass" in name_lower or "seed" in name_lower:
-                guessed_type = "Grass"
-            elif "ice" in name_lower or "freeze" in name_lower:
-                guessed_type = "Ice"
-            elif "rock" in name_lower or "stone" in name_lower:
-                guessed_type = "Rock"
-            elif "bug" in name_lower or "u-turn" in name_lower:
-                guessed_type = "Bug"
-            elif "dark" in name_lower or "crunch" in name_lower or "knock" in name_lower:
-                guessed_type = "Dark"
-            elif "steel" in name_lower or "iron" in name_lower:
-                guessed_type = "Steel"
 
-            eff = predict_effectiveness(guessed_type, pokemon_types(defender)) if guessed_type else 1.0
-            #eff = defender.damage_multiplier(Move(move_id, 0, None, None))  # use built-in method if available
-            if(eff > 1.0):  # only consider super-effective moves
-                ranked.append((eff, move_id))
-        ranked.sort(reverse=True)
+    def likely_strong_moves(self, attacker: Pokemon, defender: Pokemon) -> List[str]:
+        moves = self.plausible.get(attacker.species, [])
+        # Each plausible move is a dict with "name" and "type"
+        # For each, predict effectiveness vs defender
+        move_effects = []
+        for move in moves:
+            move_name = move.get("name", "")
+            move_type = move.get("type", "")
+            eff = predict_effectiveness(move_type, pokemon_types(defender)) if move_type else 1.
+            if has_stab(move, attacker):
+                eff *= 1.5  # Apply STAB boost
+            move_effects.append({"name": move_name, "type": move_type, "effectiveness": eff})
+        # Optionally, sort by effectiveness descending
+        move_effects.sort(key=lambda x: x["effectiveness"], reverse=True)
+        # Return as list of (effectiveness, move_name)
+        ranked = [(m["effectiveness"], m["name"]) for m in move_effects]
+        print(len(moves), "plausible moves for", attacker.species, "vs", defender.species, "->", ranked)
         return ranked
-        #return [n for _, n in ranked]
 
 
 class CustomAgent(Player):
@@ -374,18 +651,23 @@ class CustomAgent(Player):
     # ---- Core decision logic ----
     def choose_move(self, battle: AbstractBattle):
         # Update opponent model from current state
+        # Count number of non-fainted Pokémon in our team
+        alive_count = sum(1 for p in battle.team.values() if not p.fainted)
+        opponent_alive_count = sum(1 for p in battle.opponent_team.values() if not p.fainted)
+        self.log(battle, f"Non-fainted Pokémon in team: {alive_count} and opponent team: {opponent_alive_count}")
+
         self.log(battle, f"Active: {battle.active_pokemon.species if battle.active_pokemon else 'None'} \
-                 ({battle.active_pokemon.current_hp_fraction:.2%} HP) vs \
-                    {battle.opponent_active_pokemon.species if battle.opponent_active_pokemon else 'None'} \
-                        ({battle.opponent_active_pokemon.current_hp_fraction:.2%} HP) with available moves \
-                            {', '.join([m.id for m in battle.available_moves]) if battle.available_moves else 'None'}")
+             ({battle.active_pokemon.current_hp_fraction:.2%} HP) vs \
+                {battle.opponent_active_pokemon.species if battle.opponent_active_pokemon else 'None'} \
+                ({battle.opponent_active_pokemon.current_hp_fraction:.2%} HP) with available moves \
+                    {', '.join([m.id for m in battle.available_moves]) if battle.available_moves else 'None'}")
         self.opp_model.update_with_battle(battle)
         me = battle.active_pokemon
         opp = battle.opponent_active_pokemon
 
         # If we must force a random choice (e.g., struggle), fallback
-        if battle.force_switch or (me.current_hp < 30 or me.current_hp_fraction < 0.3 ): #switch out at low hp
-            self.log(battle, f"Forced switch required. Current pokemon: {battle.active_pokemon.species if battle.active_pokemon \
+        if battle.force_switch or (me.current_hp < 20 or me.current_hp_fraction < 0.2 ): #switch out at low hp
+            self.log(battle, f"Forced switch required or LOW HP. Current pokemon: {battle.active_pokemon.species if battle.active_pokemon \
         else 'None'} and current pokemon hp is {battle.active_pokemon.current_hp if battle.active_pokemon else 'None'} \
         and available moves are {', '.join([m.id for m in battle.available_moves]) if battle.available_moves else 'None'}")
             choice = self._choose_best_switch(battle)
@@ -415,6 +697,7 @@ class CustomAgent(Player):
         _, opp_is_ko, opp_attack_move_exists = self._select_best_move(battle, False)
         opp_faster = is_first_one_faster(opp, me) 
         opp_dangerous =predict_effectiveness(pokemon_types(opp)[0], pokemon_types(me)) >=2.0
+        print(f"Opponent dangerous: {opp_dangerous}, faster: {opp_faster}, KO: {opp_is_ko}, attack exists: {opp_attack_move_exists}")
         if opp_faster and (opp_is_ko or opp_dangerous):
             is_opponent_faster_and_lethal = True
             self.log(battle, f"Opponent {opp.species} is faster and likely dangerous.")
@@ -472,11 +755,14 @@ class CustomAgent(Player):
                 return self.create_order(best_move)
             elif best_switch:
                 if switch_score >= opp.current_hp:
-                    self.log(battle, "No valid attack move available, considering switch.")
+                    self.log(battle, f"Only neutral or status moves. Switching to {best_switch.species}. Switch score: {switch_score}, Opponent HP: {opp.current_hp}")
                     return self.create_order(best_switch)
                 else:
-                    self.log(battle, f"Choosing to move over switch :{best_switch.species} Move chosen: {best_move }")
+                    self.log(battle, f"Choosing to move over switch: {best_switch.species} | Move chosen: {best_move.id}")
                     return self.create_order(best_move)
+            else:
+                self.log(battle, f"No valid switch available, choosing move: {best_move.id}")
+                return self.create_order(best_move)
 
         if best_switch:
             self.log(battle, f"Switch chosen: {best_switch.species} | {switch_reason}")
@@ -507,8 +793,9 @@ class CustomAgent(Player):
         if is_status_move(move) or move.base_power is None or move.base_power <= 0:
             return 0.0, 0.0, 0.0  # status moves do no damage but may be needed
 
-        eff = defender.damage_multiplier(move)  
-        stab = 1.5 if has_stab(move, attacker) else 1.0
+        eff = defender.damage_multiplier(move) 
+        move_type = move.type.name if hasattr(move.type, "name") else str(move.type) 
+        stab = 1.5 if has_stab(move_type, attacker) else 1.0
 
         weather_mult = self.get_weather_multiplier([weather], move) if weather else 1.0
 
@@ -579,7 +866,6 @@ class CustomAgent(Player):
                 eff_2, damage, recoildamage= self.estimate_damage(move, attacker, defender, battle.weather)
                 move_info = {
                     "move": move,
-                    "base_power": move.base_power,
                     "effectiveness": eff,
                     "damage": damage, 
                     "recoildamage": recoildamage,
@@ -613,7 +899,6 @@ class CustomAgent(Player):
     def choose_best_move(self, move_ranks: List[Dict], battle: AbstractBattle) -> Tuple[Optional[Move], bool, bool]:
         if not move_ranks or len(move_ranks) == 0:
             return None, False, False
-        print(move_ranks)
         komove = None
         bestmove = None
         # If any move can KO, pick the highest scoring KO move
@@ -621,14 +906,13 @@ class CustomAgent(Player):
             self.log(battle, f"Found {len(exists)} moves that can KO the opponent.")
             exists.sort(key=lambda x: x["damage"], reverse=True)
             komove = exists[0]["move"]
-            self.log(battle, f"Choosing KO move {komove.id} with damage {exists[0]['damage']:.1f}.")
             return komove, True, True
         # Sort moves by damage descending
         move_ranks.sort(key=lambda x: x["damage"], reverse=True)
         attack_move_exists = True
         if not move_ranks[0]["is_super_effective"]:  # No super effective move
             attack_move_exists = False
-            self.log(battle, "No effective attacking move found, choosing next best")
+            #self.log(battle, "No effective attacking move found, choosing next best")
         #TODO: choose healing move or neutral move?
         bestmove = move_ranks[0]["move"]
         return bestmove, False, attack_move_exists
@@ -640,23 +924,19 @@ class CustomAgent(Player):
             return None, -1.0, "No switches"
         
         if opp.moves is None or len(opp.moves) < 4:
-            self.log(battle, f"All moves for {opp.species} not yet known; guess likely STABs")
+            self.log(battle, f"All moves for {opp.species} not yet known; guess likely moves and STABs")
             
         # Evaluate switches by how well they resist likely moves and threaten back
         candidates = []
-        likely = self.opp_model.likely_strong_moves(opp.species, me)  # may be empty #only bring strong moves
+        likely = self.opp_model.likely_strong_moves(opp, me)  # may be empty 
         for sw in battle.available_switches:
-            # Defensive merit: count resistances to opponent's STABs (approx via species priors)
-            # Simple: if switch resists opp's primary STAB (guess by species), score higher
             resist_score = 0.0
             if opp.moves is None or len(opp.moves) < 4:
-                stab_types = self._guess_stab_types(opp.species)
-                for t in stab_types:
-                    resist_score += {0.5: 8.0, 0.0: 12.0, 2.0: -10.0, 1.0: 0.0}.get(predict_effectiveness(t, pokemon_types(sw)), 0.0)
                 if likely:
                     for ef, _ in likely:
                         resist_score += {0.5: 8.0, 0.0: 12.0, 2.0: -10.0, 1.0: 0.0}.get(ef, 0.0)
             if opp.moves:
+                #print(f"Opponent {opp.species} moves: {opp.moves}")
                 for mv in opp.moves.values():
                     if not mv or not mv.id:
                         continue
@@ -685,8 +965,7 @@ class CustomAgent(Player):
                         threat = max(threat, self.estimate_damage(m,sw, opp, battle.weather)[1])
                         threatmult = max(threatmult, self.estimate_damage(m,sw, opp, battle.weather)[0])
             # Health consideration
-            hp_factor = current_hp_fraction(sw) * 10.0
-            hp_factor= sw.current_hp_fraction
+            hp_factor = sw.current_hp_fraction * 100.0
             self.log(battle, f"Switch candidate {sw.species}: resist_score {resist_score:.1f}, threat {threat:.1f}, hp_factor {hp_factor:.1f}")
             score = resist_score + threat + hp_factor #TOO simplisitic?
             candidates.append((sw, threat, threatmult, hp_factor, resist_score))
@@ -696,7 +975,7 @@ class CustomAgent(Player):
         # Sort by: highest resist_score, then highest threat, then highest current_hp_fraction
         candidates_sorted = sorted(
             candidates,
-            key=lambda x: (x[4], x[1], x[3]),  # x[4]=resist_score, x[1]=threat, x[3]=current_hp_fraction
+            key=lambda x: (x[3], x[4], x[1]),  # x[4]=resist_score, x[1]=threat, x[3]=current_hp_fraction
             reverse=True
         )
         #candidates.sort(reverse=True, key=lambda x: x[0])
@@ -707,21 +986,13 @@ class CustomAgent(Player):
         reason = f"Resists predicted STABs and can threaten back (score {high_threat:.1f})."
         return best_sw, high_threat, reason
 
-    def _guess_stab_types(self, species: str) -> List[str]:
-        # Minimal mapping to primary typing for key threats
-        # Extend with more species as needed.
-        guess = {
-            "Koraidon": ["Fighting", "Dragon"],
-            "Zacian-Crowned": ["Fairy", "Steel"],
-            "Flutter Mane": ["Ghost", "Fairy"],
-            "Great Tusk": ["Ground", "Fighting"],
-            "Ting-Lu": ["Ground", "Dark"],
-        }
-        return guess.get(species, [])
+
 
     def _choose_best_switch(self, battle: AbstractBattle) -> Optional[Pokemon]:
         sw, _, _ = self.choose_best_switch(battle)
         return sw
+
+    #unused functions here
 
     # Optional: very conservative tera usage example (disabled by default)
     def _tera_secures_ko(self, battle: AbstractBattle, move: Move) -> bool:
@@ -733,7 +1004,7 @@ class CustomAgent(Player):
         atk_type = move_type_name(move)
         if not atk_type:
             return False
-        already_stab = has_stab(move, me)
+        already_stab = has_stab(atk_type, me)
         if already_stab:
             return False
         # Assume tera type equals move type if possible (Showdown requires choosing team tera; poke_env tracks available)
@@ -741,7 +1012,6 @@ class CustomAgent(Player):
         return False
     
 
-    #unused functions here
     def _should_set_rocks(self, battle: AbstractBattle) -> bool:
         # Prefer to set rocks early if:
         # - We have a healthy setter in vs. a passive or forced target
@@ -753,7 +1023,7 @@ class CustomAgent(Player):
         if rocks_up_for_opp(battle):
             return False
         # If we are Ting-Lu and relatively safe, set rocks
-        if me.species == "Ting-Lu" and current_hp_fraction(me) > 0.6:
+        if me.species == "Ting-Lu" and me.current_hp_fraction > 0.6:
             # Avoid setting into obvious threatening super-effective hits
             # If opp likely to KO us with a strong SE hit, don't set
             if not self._opp_can_threaten_heavily(battle, me):
@@ -777,108 +1047,15 @@ class CustomAgent(Player):
         opp = battle.opponent_active_pokemon
         if not opp or not target:
             return False
-        likely = self.opp_model.likely_strong_moves(opp.species, target)
+        likely = self.opp_model.likely_strong_moves(opp, target)
         # If any likely move is super-effective, consider threatened
         for mv in likely[:2]:
             # quick type guess already done in model via effectiveness
             # If we have no likely list yet, be conservative iff target < 60%
             pass
         # Conservative fallback: if we're below 60% vs a known breaker, consider threatened
-        if opp.species in {"Koraidon", "Miraidon", "Zacian-Crowned", "Flutter Mane"} and current_hp_fraction(target) < 0.6:
+        if opp.species in {"Koraidon", "Miraidon", "Zacian-Crowned", "Flutter Mane"} and target.current_hp_fraction < 0.6:
             return True
         return False
 
     
-    def _best_attacking_move(self, battle: AbstractBattle) -> Tuple[Optional[Move], float, str]:
-        me = battle.active_pokemon
-        opp = battle.opponent_active_pokemon
-        if not me or not opp or not battle.available_moves:
-            return None, -1.0, "No valid attacker/defender"
-
-        # Speed awareness: if we're slower and at risk, favor safer plays
-        my_speed = approx_speed(me)
-        opp_speed = approx_speed(opp)
-        we_outspeed = my_speed >= opp_speed
-        self.log(battle, f"Speed check: we {my_speed} vs opp {opp_speed} -> {'outspeed' if we_outspeed else 'underspeed or tie'}")  
-
-        best = None
-        best_score = -1.0
-        rationale = ""
-        for m in battle.available_moves:
-            status_move = is_status_move(m)
-            ineffective_move = would_be_ineffective(m, opp)
-            self.log(battle, f"Evaluating move {m.id}: {'status' if status_move else 'not status.move'}, {'ineffective' if ineffective_move else 'potentially effective'}")
-            if not status_move and ineffective_move:
-                continue
-
-            _,score, _ = self.estimate_damage(m, me, opp, battle.weather)
-            self.log(battle, f"Move {m.id} rough damage score: {score}")
-
-            def_max_hp = opp.max_hp if opp.max_hp and opp.max_hp > 0 else 200.0
-
-            # Priority heuristic: prefer KO lines
-            # Estimate % damage by normalizing score to a rough scale
-            # We don't have a true calc; use a soft cap for ranking
-            est_fraction = min(1.0, score / def_max_hp)  # tune this as you test
-            if est_fraction >= current_hp_fraction(opp) - 0.05:
-                score += 120.0  # KO bonus
-
-            # Prefer pivoting (U-turn/Volt Switch) when we don't KO and we are faster
-            if we_outspeed and m.id in {"uturn", "voltswitch"} and est_fraction < 0.5:
-                score += 35.0
-
-            # Prefer accurate moves when close
-            if m.accuracy is not None and (m.accuracy >= 90 or m.accuracy >= 0.9):
-                score += 8.0
-
-            # Strategic biases per role
-            if me.species in self.win_cons and current_hp_fraction(me) > 0.5:
-                # Preserve wincons: avoid recoil if not needed
-                if getattr(m, "recoil", 0):
-                    score *= 0.97
-
-            # Status utility (situational)
-            if is_status_move(m):
-                # E.g., Whirlwind on Ting-Lu vs setup, Calm Mind on Hatterene in safe spots
-                if me.species == "Ting-Lu" and (m.id == "whirlwind"):
-                    score = 40.0
-                elif me.species == "Hatterene" and (m.id == "calmmind") and current_hp_fraction(me) > 0.6:
-                    score = 45.0
-                elif is_hazard_move(m) and not rocks_up_for_opp(battle):
-                    score = 50.0
-                else:
-                    score = max(score, 5.0)
-
-            self.log(battle, f"Move {m.id} final score: {score} best so far: {best_score}")
-
-            if score > best_score:
-                self.log(battle, f"New best move candidate: {m.id} with score {score}")
-                best_score = score
-                best = m
-
-        if best is None:
-            # If all were ineffective, pick any status/neutral
-            best = random.choice(battle.available_moves)
-            best_score = 0.0
-            rationale = "All moves ineffective; choosing fallback."
-        else:
-            rationale = self._explain_move_choice(best, me, opp)
-
-        return best, best_score, rationale
-
-    def _explain_move_choice(self, move: Move, me: Pokemon, opp: Pokemon) -> str:
-        atk_type = move_type_name(move) or "Unknown"
-        eff= opp.damage_multiplier(move)  # use built-in method if available
-        stab = "with STAB" if has_stab(move, me) else "without STAB"
-        details = []
-        if eff == 0.0:
-            details.append("ineffective (coverage bait)")
-        elif eff > 1.0:
-            details.append("super-effective")
-        elif eff < 1.0:
-            details.append("resisted")
-        if is_status_move(move):
-            details.append("utility")
-        if move.accuracy is not None:
-            details.append(f"{move.accuracy} acc")
-        return f"{move.id} ({atk_type}) chosen: {'; '.join(details)} {stab}."
