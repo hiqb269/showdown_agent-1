@@ -109,16 +109,6 @@ COMMON_SETS: Dict[str, List[Dict[str, str]]] = {
         {"name": "uturn", "type": "bug"}
     ],
 
-    "miridon": [
-        {"name": "electrodrift", "type": "electric"},
-        {"name": "dracometeor", "type": "dragon"},
-        {"name": "voltswitch", "type": "electric"},
-        {"name": "overheat", "type": "fire"},
-        {"name": "calmmind", "type": "psychic"},
-        {"name": "paraboliccharge", "type": "electric"},
-        {"name": "terablast", "type": "normal"},
-        {"name": "dazzlinggleam", "type": "fairy"}
-    ],
 
     # Zacian (still Uber)
     "zaciancrowned": [
@@ -558,6 +548,10 @@ def is_hazard_move(m: Move) -> bool:
     name = m.id
     return name in {"stealthrock", "spikes", "toxicspikes", "stickyweb"}
 
+def is_healing_move(m: Move) -> bool:
+    name = m.id
+    return name in {"recover", "roost", "slackoff", "softboiled", "moonlight", "morningsun", "synthesis", "rest"}
+
 
 def is_removal_move(m: Move) -> bool:
     name = m.id
@@ -570,6 +564,14 @@ def would_be_ineffective(move: Move, defender: Pokemon) -> bool:
     #eff = effectiveness(atk_type, pokemon_types(defender))
     eff = defender.damage_multiplier(move)  # use built-in method if available
     return eff == 0.0
+
+def can_heal(p: Pokemon) -> bool:
+    if not p or p.fainted:
+        return False
+    for m in p.moves.values():
+        if m and is_healing_move(m):
+            return True
+    return False
 
 
 def has_our_hazards(battle: AbstractBattle) -> bool:
@@ -641,65 +643,82 @@ class CustomAgent(Player):
         self.debug = True  # Turn off to silence reasoning logs
 
         # Track our nominated win conditions (species we want to preserve)???
-        self.win_cons: List[str] = ["Zacian-Crowned", "Kyogre", "Arceus-Fairy"]
+        #self.win_cons: List[str] = ["Zacian-Crowned", "Kyogre", "Arceus-Fairy"]
 
     # ---- Explanation module ----
     def log(self, battle: AbstractBattle, msg: str):
         if self.debug:
             print(f"[Turn {battle.turn}] {msg}")
+            with open("battle_loghiqb269_v4.txt", "a") as f:
+                f.write(f"[Turn {battle.turn}] {msg}\n")
+    
+
+    def is_opp_immediate_threat(self, battle: AbstractBattle) -> Tuple[bool, bool, bool]:
+        opp = battle.opponent_active_pokemon
+        me = battle.active_pokemon
+        if not opp or not me:
+            return False, False, False
+        # If opponent is faster and has a likely strong move, consider it a threat
+        opp_faster = is_first_one_faster(opp, me)
+        _, opp_is_ko, opp_attack_move_exists = self._select_best_move(battle, False)
+        self.log(battle, f"Opponent dangerous: {opp_attack_move_exists}, faster: {opp_faster}, KO: {opp_is_ko}, attack exists: {opp_attack_move_exists}")
+        is_opp_threat = opp_faster and (opp_is_ko or opp_attack_move_exists)
+        return is_opp_threat, opp_faster, opp_is_ko
 
     # ---- Core decision logic ----
     def choose_move(self, battle: AbstractBattle):
         # Update opponent model from current state
         # Count number of non-fainted Pokémon in our team
         alive_count = sum(1 for p in battle.team.values() if not p.fainted)
-        opponent_alive_count = sum(1 for p in battle.opponent_team.values() if not p.fainted)
-        self.log(battle, f"Non-fainted Pokémon in team: {alive_count} and opponent team: {opponent_alive_count}")
+        self.log(battle, f"Non-fainted Pokémon in team: {alive_count}")
 
         self.log(battle, f"Active: {battle.active_pokemon.species if battle.active_pokemon else 'None'} \
              ({battle.active_pokemon.current_hp_fraction:.2%} HP) vs \
                 {battle.opponent_active_pokemon.species if battle.opponent_active_pokemon else 'None'} \
                 ({battle.opponent_active_pokemon.current_hp_fraction:.2%} HP) with available moves \
                     {', '.join([m.id for m in battle.available_moves]) if battle.available_moves else 'None'}")
+        
         self.opp_model.update_with_battle(battle)
         me = battle.active_pokemon
         opp = battle.opponent_active_pokemon
 
-        # If we must force a random choice (e.g., struggle), fallback
-        if battle.force_switch or (me.current_hp < 20 or me.current_hp_fraction < 0.2 ): #switch out at low hp
-            self.log(battle, f"Forced switch required or LOW HP. Current pokemon: {battle.active_pokemon.species if battle.active_pokemon \
-        else 'None'} and current pokemon hp is {battle.active_pokemon.current_hp if battle.active_pokemon else 'None'} \
-        and available moves are {', '.join([m.id for m in battle.available_moves]) if battle.available_moves else 'None'}")
+        # Path 1: If battle in a force switch 
+        if battle.force_switch:
+            self.log(battle, f"Forced switch required")
             choice = self._choose_best_switch(battle)
             if choice:
                 self.log(battle, f"Forced switch -> {choice.species}")
                 return self.create_order(choice)
             else:
-                self.log(battle, "No valid switch available for forced switch, choosing random move.")
-                return self.choose_random_move(battle)
-            #return self.choose_random_switch(battle) #why random switch?
+                self.log(battle, "No valid switch available for forced switch, choosing healthiest pokemon or Random move.")
+                healthiest_switch = self.choose_healthiest_switch(battle)
+                return self.create_order(healthiest_switch) if healthiest_switch else self.choose_random_move(battle)
 
-        # Early hazard plan
-        if self._should_set_rocks(battle):
-            for m in battle.available_moves:
-                if (m.id == "stealthrock") and not rocks_up_for_opp(battle):
-                    self.log(battle, "Setting Stealth Rock (early-game hazard priority).")
-                    return self.create_order(m)
+        # Path 2: Normal turn - evaluate threats, healing, attacking, switching
 
-        # Hazard removal if pressured
-        if self._should_remove_hazards(battle):
-            for m in battle.available_moves:
-                if is_removal_move(m):
-                    self.log(battle, "Removing hazards from our side.")
-                    return self.create_order(m)
-                
-        is_opponent_faster_and_lethal = False
-        _, opp_is_ko, opp_attack_move_exists = self._select_best_move(battle, False)
-        opp_faster = is_first_one_faster(opp, me) 
-        opp_dangerous =predict_effectiveness(pokemon_types(opp)[0], pokemon_types(me)) >=2.0
-        print(f"Opponent dangerous: {opp_dangerous}, faster: {opp_faster}, KO: {opp_is_ko}, attack exists: {opp_attack_move_exists}")
-        if opp_faster and (opp_is_ko or opp_dangerous):
-            is_opponent_faster_and_lethal = True
+        #Path 2: Check for immediate threats (faster opponent with strong move)
+        self.log(battle, f"Analysing opponent {opp.species}")
+        is_opp_threat, opp_faster, opp_is_ko = self.is_opp_immediate_threat(battle)
+
+        #Path 2a-1: Check for low HP and consider healing or switching
+        if (me.current_hp < 15 or me.current_hp_fraction < 0.15):
+            self.log(battle, f"Low HP warning for {me.species}")
+            if not is_opp_threat and can_heal(me):
+                self.log(battle, f"Considering healing for {me.species}")
+                for m in battle.available_moves:
+                    if m and is_healing_move(m):
+                        self.log(battle, f"Healing move chosen: {m.id}")
+                        return self.create_order(m)
+            else:
+                choice = self._choose_best_switch(battle)
+                if choice:
+                    self.log(battle, f"Switching to {choice.species} because opponent is a threat" if is_opp_threat else f"Switching to {choice.species} because of low HP.")
+                    return self.create_order(choice)
+                else:
+                    return self.create_order(healthiest_switch) if healthiest_switch else self.choose_random_move(battle)
+        
+        #Path 2a-2: If  opponent is an immediate threat, consider switching first
+        if is_opp_threat == True:
             self.log(battle, f"Opponent {opp.species} is faster and likely dangerous.")
             choice = self._choose_best_switch(battle)
             if choice:
@@ -708,61 +727,49 @@ class CustomAgent(Player):
             else:
                 self.log(battle, "No valid switch available to avoid KO threat, proceeding with attack.")
 
-        # Evaluate attacking options
+        # Path 3: Evaluate attacking options
         if battle.available_moves:
-            #best_move, best_score, rationale = self._best_attacking_move(battle)
+            self.log(battle, f"Evaluating attacking options")
             best_move, is_ko, attack_move_exists = self._select_best_move(battle, True)
-            if best_move and is_ko:
+
+        #Path 3a: If we have a KO move, use it
+        if best_move:
+            if is_ko:
                 self.log(battle, f"Move chosen: {best_move.id} | Potential KO move")
                 return self.create_order(best_move)
-            elif best_move and attack_move_exists:
-                best_score = 10  # placeholder
+        #Path 3b: If no KO move, but we have an attacking move, use it if opponent is low HP 
+            if attack_move_exists:
+                if(opp.current_hp_fraction < 0.40):
+                    self.log(battle, f"Opponent low HP ({opp.current_hp_fraction:.2%}), attacking {best_move.id}")
             else:
-                best_score = 1.00
-            rationale = "Best estimated damage move"
+                self.log(battle, f"No strong attacking move available.")
         else:
-            best_move, best_score, rationale = (None, -1.0, "No moves available")
+            best_move = None
 
-        # Evaluate switching options for safety
-        if opp.moves:
+        # Path 4 - Evaluate switching options for safety
+        if opp.moves and not is_ko and not attack_move_exists:
+            self.log(battle, f"Evaluating switching options if no strong move present")
             if opp_is_ko and battle.available_switches:
-                self.log(battle, f"Opponent likely has a KO move ({', '.join(opp.moves.keys())}), considering switch.")
+                self.log(battle, f"Opponent likely has a KO move - considering switch.")
                 choice = self._choose_best_switch(battle)
                 if choice:
                     self.log(battle, f"Switching to {choice.species} to avoid KO threat.")
                     return self.create_order(choice)
                 else:
                     self.log(battle, "No valid switch available to avoid KO threat, proceeding with attack.")
-
-        elif(predict_effectiveness(pokemon_types(opp)[0], pokemon_types(me)) >=2.0): 
-            #switch if opponent is super effective and we don't have a good move
-            choice = self._choose_best_switch(battle)
-            if choice:
-                self.log(battle, f"Switching to {choice.species} to avoid super-effective hit.")
-                return self.create_order(choice)
-            else:
-                self.log(battle, "No valid switch available to avoid super-effective hit, proceeding with attack.")
+    
         best_switch, switch_score, switch_reason = self.choose_best_switch(battle)
 
         # Final decision: compare best move vs best switch
         if best_move:
-            if attack_move_exists: #and (best_score >= switch_score or not best_switch):
-                self.log(battle, f"Move chosen: {best_move.id} | {rationale}")
-                # Optional: add simple tera logic (very conservative)
-                # if battle.can_tera and self._tera_secures_ko(battle, best_move):
-                #     self.log(battle, "Terastallizing to secure KO.")
-                #     return self.create_order(best_move, terastallize=True)
-                return self.create_order(best_move)
-            elif best_switch:
-                if switch_score >= opp.current_hp:
-                    self.log(battle, f"Only neutral or status moves. Switching to {best_switch.species}. Switch score: {switch_score}, Opponent HP: {opp.current_hp}")
+            self.log(battle, f"Best move: {best_move.id} vs Best switch: {best_switch.species if best_switch else 'None'}")
+            if best_switch:
+                if (switch_score/opp.max_hp * 100) >= opp.current_hp:
+                    self.log(battle, f"Switching to {best_switch.species}. Switch score: {switch_score}, Opponent HP: {opp.current_hp}")
                     return self.create_order(best_switch)
                 else:
                     self.log(battle, f"Choosing to move over switch: {best_switch.species} | Move chosen: {best_move.id}")
                     return self.create_order(best_move)
-            else:
-                self.log(battle, f"No valid switch available, choosing move: {best_move.id}")
-                return self.create_order(best_move)
 
         if best_switch:
             self.log(battle, f"Switch chosen: {best_switch.species} | {switch_reason}")
@@ -772,6 +779,16 @@ class CustomAgent(Player):
         self.log(battle, "Fallback: random choice.")
         return self.choose_random_move(battle)
 
+    def choose_healthiest_switch(self, battle: AbstractBattle) -> Optional[Pokemon]:
+        healthiest = None
+        max_hp_frac = -1.0
+        for p in battle.available_switches:
+            if p and not p.fainted:
+                hp_frac = p.current_hp_fraction if hasattr(p, 'current_hp_fraction') else (p.current_hp / p.max_hp if p.max_hp > 0 else 0)
+                if hp_frac > max_hp_frac:
+                    healthiest = p
+                    max_hp_frac = hp_frac
+        return healthiest
 
     def get_weather_multiplier(self, weathers: list[Weather], move: Move) -> float:
         mult: float = 1.0
@@ -840,16 +857,20 @@ class CustomAgent(Player):
 
         return multiplier, score, recoildamage
 
-    def _assign_move_ranks(self, battle: AbstractBattle, for_me: bool = True) -> Optional[List[Dict]]:
-        attacker, defender, moves = None, None, None
-        if for_me:
+    def _assign_move_ranks(self, battle: AbstractBattle, for_me: bool) -> Optional[List[Dict]]:
+        attacker, defender, moves, likely = None, None, None, None
+        self.log(battle, f"Assigning move ranks for {'us' if for_me else 'opponent'}")
+        if for_me == True:
             attacker = battle.active_pokemon
             defender = battle.opponent_active_pokemon
             moves = battle.available_moves
-        else:
+        elif for_me == False:
             attacker = battle.opponent_active_pokemon
             defender = battle.active_pokemon
             moves = battle.opponent_active_pokemon.moves.values()
+            if not moves or len(moves) < 4:
+                likely = self.opp_model.likely_strong_moves(attacker, defender)
+
         if not attacker or not defender or not moves:
             return None
         
@@ -877,7 +898,27 @@ class CustomAgent(Player):
                     "is_status": is_status_move(move),
                 }
                 move_ranks.append(move_info)
+
+        if likely:
+                    for ef, mv in likely:
+                        if mv not in move_ids:
+                            move_info = {
+                                "move": Move(move_id=mv, gen=9,),
+                                "effectiveness": ef,
+                                "damage": -1.00,  # unknown
+                                "recoildamage": -1.00,
+                                "can_KO": self.is_possible_KO(ef, -1.00, defender),
+                                "can_recoil_KO": False,
+                                "is_super_effective": ef > 1.0,
+                                "is_resisted": ef < 1.0,
+                                "is_neutral": ef == 1.0,
+                            }
+                            move_ranks.append(move_info)
+        
+        if(for_me):
+            self.log(battle, f"Move ranks for {attacker.species} vs {defender.species}: {move_ranks}")
         return move_ranks
+                        
     
     def is_possible_KO(self, eff:float, damage: float, target: Pokemon) -> bool:
         if not target or target.current_hp is None:
@@ -886,8 +927,9 @@ class CustomAgent(Player):
         #est_fraction = min(1.0, damage / def_max_hp)  
         #if est_fraction >= current_hp_fraction(target):
         #    return True
-        if eff > 1.0 and damage >= target.current_hp:
-            return True
+        if eff > 1.0:
+            if damage == -1.00 or damage >= target.current_hp:
+                return True
         return False
 
     def _select_best_move(self, battle: AbstractBattle, for_me: bool) -> Tuple[Optional[Move], bool, bool]:
@@ -904,7 +946,12 @@ class CustomAgent(Player):
         # If any move can KO, pick the highest scoring KO move
         if exists := [m for m in move_ranks if m["can_KO"]]:
             self.log(battle, f"Found {len(exists)} moves that can KO the opponent.")
-            exists.sort(key=lambda x: x["damage"], reverse=True)
+            # If all recoildamage is zero, sort by damage descending
+            if all(m["recoildamage"] == 0 for m in exists):
+                exists.sort(key=lambda x: x["damage"], reverse=True)
+            else:
+                # Sort by least recoildamage, then by highest damage
+                exists.sort(key=lambda x: (x["recoildamage"], -x["damage"]))
             komove = exists[0]["move"]
             return komove, True, True
         # Sort moves by damage descending
@@ -912,7 +959,6 @@ class CustomAgent(Player):
         attack_move_exists = True
         if not move_ranks[0]["is_super_effective"]:  # No super effective move
             attack_move_exists = False
-            #self.log(battle, "No effective attacking move found, choosing next best")
         #TODO: choose healing move or neutral move?
         bestmove = move_ranks[0]["move"]
         return bestmove, False, attack_move_exists
@@ -928,19 +974,29 @@ class CustomAgent(Player):
             
         # Evaluate switches by how well they resist likely moves and threaten back
         candidates = []
-        likely = self.opp_model.likely_strong_moves(opp, me)  # may be empty 
         for sw in battle.available_switches:
+            opp_can_KO = False
+            opp_may_KO = False
             resist_score = 0.0
+            likely = self.opp_model.likely_strong_moves(opp, sw)
             if opp.moves is None or len(opp.moves) < 4:
                 if likely:
-                    for ef, _ in likely:
+                    for ef, _ in likely: #TODO: check for survival (ef > 2)
                         resist_score += {0.5: 8.0, 0.0: 12.0, 2.0: -10.0, 1.0: 0.0}.get(ef, 0.0)
+                    super_effective_count = sum(1 for ef_val, _ in likely if ef_val >= 2)
+                    neutral_count = sum(1 for ef_val, _ in likely if ef_val == 1)
+                    resisted_count = sum(1 for ef_val, _ in likely if ef_val < 1)
+                    opp_may_KO = super_effective_count > 0
+            
             if opp.moves:
-                #print(f"Opponent {opp.species} moves: {opp.moves}")
                 for mv in opp.moves.values():
                     if not mv or not mv.id:
                         continue
                     eff = self.estimate_damage(mv,opp, sw, battle.weather)[0]
+                    predicted_damage = self.estimate_damage(mv,opp, sw, battle.weather)[1]
+                    if predicted_damage >= sw.current_hp and eff > 1.0:
+                        opp_can_KO = True
+                        break
                     if eff <= 0.0:
                         bucket = 0.0  # immune
                     elif eff < 0.75:
@@ -967,18 +1023,44 @@ class CustomAgent(Player):
             # Health consideration
             hp_factor = sw.current_hp_fraction * 100.0
             self.log(battle, f"Switch candidate {sw.species}: resist_score {resist_score:.1f}, threat {threat:.1f}, hp_factor {hp_factor:.1f}")
-            score = resist_score + threat + hp_factor #TOO simplisitic?
-            candidates.append((sw, threat, threatmult, hp_factor, resist_score))
+            #score = resist_score + threat + hp_factor #TOO simplisitic?
+            candidates.append((sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO))
 
         if not candidates:
             return None, -1.0, "No candidates"
-        # Sort by: highest resist_score, then highest threat, then highest current_hp_fraction
+        # Sort candidates by threat level from opponent:
+        # 1. Candidates where opp_may_KO and opp_can_KO are both True (worst) -- bottom
+        # 2. Candidates where only opp_can_KO is True -- just above
+        # 3. Candidates where only opp_may_KO is True -- above that
+        # 4. Candidates where neither is True -- best, at the top
+        def candidate_sort_key(x):
+            sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO = x
+            # Lower is better for opp_can_KO/opp_may_KO, so True = 1, False = 0
+            # Both True = 2, only can_KO = 1, only may_KO = 1, neither = 0
+            # But we want both True (worst) at bottom, so use tuple:
+            # (both_true, can_KO, may_KO, -hp, -threat)
+            both_true = int(opp_may_KO and opp_can_KO)
+            return (
+                both_true,
+                int(opp_can_KO),
+                int(opp_may_KO),
+                -hp_factor,
+                -threat,
+                -resist_score
+            )
+
         candidates_sorted = sorted(
             candidates,
-            key=lambda x: (x[3], x[4], x[1]),  # x[4]=resist_score, x[1]=threat, x[3]=current_hp_fraction
-            reverse=True
+            key=candidate_sort_key
         )
-        #candidates.sort(reverse=True, key=lambda x: x[0])
+        self.log(battle, "Sorted switch candidates:")
+        for sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO in candidates_sorted:
+            self.log(battle, f"  {sw.species}: threat {threat:.1f}, hp_factor {hp_factor:.1f}, resist_score {resist_score:.1f}, opp_may_KO {opp_may_KO}, opp_can_KO {opp_can_KO}")
+        #candidates_sorted = sorted(
+        #    candidates,
+        #    key=lambda x: (x[2], x[3], x[1]),  # x[3]=resist_score, x[1]=threat, x[2]=current_hp_fraction
+        #    reverse=True
+        #)
         best_sw = candidates_sorted[0][0]
         #best_score = candidates_sorted[0][2] + candidates_sorted[0][3] + candidates_sorted[0][4]
         high_threat = candidates_sorted[0][1] 
