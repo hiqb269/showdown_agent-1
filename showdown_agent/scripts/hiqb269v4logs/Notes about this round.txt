@@ -1,0 +1,1 @@
+Ran 10 times - both have exactly the same team - v1 does not take advantage of what team is there but there are team and pokemon specific checks

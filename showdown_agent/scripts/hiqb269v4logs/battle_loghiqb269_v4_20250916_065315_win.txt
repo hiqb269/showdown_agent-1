@@ -1,0 +1,553 @@
+[Turn 1] Non-fainted Pokémon in team: 6
+[Turn 1] Active: arceusground              (100.00% HP) vs                 hooh                 (100.00% HP) with available moves                     judgment, calmmind, recover, icebeam
+[Turn 1] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 1] Assigning move ranks for us
+[Turn 1] Evaluating moves judgment, calmmind, recover, icebeam for arceusground vs hooh
+[Turn 1] Move ranks for arceusground vs hooh: [{'move': judgment (Move object), 'effectiveness': 1, 'damage': 92.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 1.0, 'damage': 82.8, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 1] Analysis: Opponent is not an immediate threat; good time to set up.
+[Turn 1] Priority 5: Setting up with Calm Mind.
+[Turn 2] Non-fainted Pokémon in team: 6
+[Turn 2] Active: arceusground              (61.26% HP) vs                 hooh                 (84.00% HP) with available moves                     judgment, calmmind, recover, icebeam
+[Turn 2] Assigning move ranks for opponent
+[Turn 2] Evaluating moves bravebird, sacredfire, defog, recover, earthquake, toxic for hooh vs arceusground
+[Turn 2] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 2] Assigning move ranks for us
+[Turn 2] Evaluating moves judgment, calmmind, recover, icebeam for arceusground vs hooh
+[Turn 2] Move ranks for arceusground vs hooh: [{'move': judgment (Move object), 'effectiveness': 1, 'damage': 138.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 1.0, 'damage': 124.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 2] Analysis: arceusground is a key mon; preserving it with healing.
+[Turn 2] Priority 3: Healing arceusground with recover.
+[Turn 3] Non-fainted Pokémon in team: 6
+[Turn 3] Active: arceusground              (58.78% HP) vs                 hooh                 (67.00% HP) with available moves                     judgment, calmmind, recover, icebeam
+[Turn 3] Assigning move ranks for opponent
+[Turn 3] Evaluating moves bravebird, sacredfire, defog, recover, earthquake, toxic for hooh vs arceusground
+[Turn 3] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 3] Assigning move ranks for us
+[Turn 3] Evaluating moves judgment, calmmind, recover, icebeam for arceusground vs hooh
+[Turn 3] Move ranks for arceusground vs hooh: [{'move': judgment (Move object), 'effectiveness': 1, 'damage': 138.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 1.0, 'damage': 124.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 3] Analysis: arceusground is a key mon; preserving it with healing.
+[Turn 3] Priority 3: Healing arceusground with recover.
+[Turn 4] Non-fainted Pokémon in team: 6
+[Turn 4] Active: arceusground              (56.08% HP) vs                 hooh                 (49.00% HP) with available moves                     judgment, calmmind, recover, icebeam
+[Turn 4] Assigning move ranks for opponent
+[Turn 4] Evaluating moves bravebird, sacredfire, defog, recover, earthquake, toxic for hooh vs arceusground
+[Turn 4] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 4] Assigning move ranks for us
+[Turn 4] Evaluating moves judgment, calmmind, recover, icebeam for arceusground vs hooh
+[Turn 4] Move ranks for arceusground vs hooh: [{'move': judgment (Move object), 'effectiveness': 1, 'damage': 138.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 1.0, 'damage': 124.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 4] Priority 1: Securing KO on boosted threat hooh with judgment.
+[Turn 5] Non-fainted Pokémon in team: 6
+[Turn 5] Active: arceusground              (16.67% HP) vs                 hooh                 (33.00% HP) with available moves                     judgment, calmmind, recover, icebeam
+[Turn 5] Assigning move ranks for opponent
+[Turn 5] Evaluating moves bravebird, sacredfire, defog, recover, earthquake, toxic for hooh vs arceusground
+[Turn 5] Opponent dangerous: True, has boosts: False, faster: False, KO: True, opponent may have a ko move: False
+[Turn 5] Assigning move ranks for us
+[Turn 5] Evaluating moves judgment, calmmind, recover, icebeam for arceusground vs hooh
+[Turn 5] Move ranks for arceusground vs hooh: [{'move': judgment (Move object), 'effectiveness': 1, 'damage': 138.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 1.0, 'damage': 124.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 5] Priority 1: Securing KO on boosted threat hooh with judgment.
+[Turn 5] Non-fainted Pokémon in team: 5
+[Turn 5] Active: arceusground              (0.00% HP) vs                 hooh                 (26.00% HP) with available moves                     None
+[Turn 5] Forced switch required
+[Turn 5] All moves for hooh not yet known; guess likely moves
+[Turn 5] Evaluating known 1 moves for hooh
+[Turn 5] Switch candidate kyogre: resist_score -10.0, threat 414.0, hp_factor 100.0
+[Turn 5] All moves for hooh not yet known; guess likely moves
+[Turn 5] Evaluating known 1 moves for hooh
+[Turn 5] Switch candidate koraidon: resist_score -10.0, threat 165.6, hp_factor 100.0
+[Turn 5] All moves for hooh not yet known; guess likely moves
+[Turn 5] Evaluating known 1 moves for hooh
+[Turn 5] Switch candidate necrozmaduskmane: resist_score 10.0, threat 69.0, hp_factor 100.0
+[Turn 5] All moves for hooh not yet known; guess likely moves
+[Turn 5] Evaluating known 1 moves for hooh
+[Turn 5] Switch candidate hooh: resist_score 2.0, threat 165.6, hp_factor 100.0
+[Turn 5] All moves for hooh not yet known; guess likely moves
+[Turn 5] Evaluating known 1 moves for hooh
+[Turn 5] Switch candidate zaciancrowned: resist_score 10.0, threat 165.6, hp_factor 100.0
+[Turn 5] Sorted switch candidates:
+[Turn 5]   kyogre: threat 414.0, hp_factor 100.0, resist_score -10.0, opp_may_KO False, opp_can_KO False
+[Turn 5]   hooh: threat 165.6, hp_factor 100.0, resist_score 2.0, opp_may_KO False, opp_can_KO False
+[Turn 5]   zaciancrowned: threat 165.6, hp_factor 100.0, resist_score 10.0, opp_may_KO True, opp_can_KO False
+[Turn 5]   koraidon: threat 165.6, hp_factor 100.0, resist_score -10.0, opp_may_KO True, opp_can_KO False
+[Turn 5]   necrozmaduskmane: threat 69.0, hp_factor 100.0, resist_score 10.0, opp_may_KO True, opp_can_KO False
+[Turn 5] Forced switch -> kyogre
+[Turn 6] Non-fainted Pokémon in team: 5
+[Turn 6] Active: kyogre              (100.00% HP) vs                 hooh                 (26.00% HP) with available moves                     waterspout, originpulse, icebeam, thunder
+[Turn 6] Assigning move ranks for opponent
+[Turn 6] Evaluating moves bravebird, defog, recover, earthquake, toxic, sacredfire for hooh vs kyogre
+[Turn 6] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 6] Assigning move ranks for us
+[Turn 6] Evaluating moves waterspout, originpulse, icebeam, thunder for kyogre vs hooh
+[Turn 6] Move ranks for kyogre vs hooh: [{'move': waterspout (Move object), 'effectiveness': 2, 'damage': 414.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': originpulse (Move object), 'effectiveness': 2, 'damage': 258.06, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 1.0, 'damage': 82.8, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': thunder (Move object), 'effectiveness': 2, 'damage': 141.68, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 6] Priority 1: Securing KO on boosted threat hooh with waterspout.
+[Turn 7] Non-fainted Pokémon in team: 5
+[Turn 7] Active: kyogre              (100.00% HP) vs                 kyogre                 (100.00% HP) with available moves                     waterspout
+[Turn 7] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 7] Assigning move ranks for us
+[Turn 7] Evaluating moves waterspout for kyogre vs kyogre
+[Turn 7] Move ranks for kyogre vs kyogre: [{'move': waterspout (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 7] All moves for kyogre not yet known; guess likely moves
+[Turn 7] Switch candidate koraidon: resist_score -12.0, threat 165.6, hp_factor 100.0
+[Turn 7] All moves for kyogre not yet known; guess likely moves
+[Turn 7] Switch candidate necrozmaduskmane: resist_score 8.0, threat 92.0, hp_factor 100.0
+[Turn 7] All moves for kyogre not yet known; guess likely moves
+[Turn 7] Switch candidate hooh: resist_score -10.0, threat 165.6, hp_factor 100.0
+[Turn 7] All moves for kyogre not yet known; guess likely moves
+[Turn 7] Switch candidate zaciancrowned: resist_score 16.0, threat 165.6, hp_factor 100.0
+[Turn 7] Sorted switch candidates:
+[Turn 7]   zaciancrowned: threat 165.6, hp_factor 100.0, resist_score 16.0, opp_may_KO False, opp_can_KO False
+[Turn 7]   necrozmaduskmane: threat 92.0, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 7]   hooh: threat 165.6, hp_factor 100.0, resist_score -10.0, opp_may_KO True, opp_can_KO False
+[Turn 7]   koraidon: threat 165.6, hp_factor 100.0, resist_score -12.0, opp_may_KO True, opp_can_KO False
+[Turn 7] Priority 8: No other conditions met; using best available move waterspout.
+[Turn 8] Non-fainted Pokémon in team: 5
+[Turn 8] Active: kyogre              (10.26% HP) vs                 kyogre                 (36.00% HP) with available moves                     waterspout
+[Turn 8] Assigning move ranks for opponent
+[Turn 8] Evaluating moves thunder, calmmind, waterspout, originpulse, surf, icebeam for kyogre vs kyogre
+[Turn 8] Opponent dangerous: True, has boosts: False, faster: False, KO: True, opponent may have a ko move: False
+[Turn 8] Assigning move ranks for us
+[Turn 8] Evaluating moves waterspout for kyogre vs kyogre
+[Turn 8] Move ranks for kyogre vs kyogre: [{'move': waterspout (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 8] All moves for kyogre not yet known; guess likely moves
+[Turn 8] Evaluating known 1 moves for kyogre
+[Turn 8] Switch candidate koraidon: resist_score -12.0, threat 165.6, hp_factor 100.0
+[Turn 8] All moves for kyogre not yet known; guess likely moves
+[Turn 8] Evaluating known 1 moves for kyogre
+[Turn 8] Switch candidate necrozmaduskmane: resist_score 8.0, threat 92.0, hp_factor 100.0
+[Turn 8] All moves for kyogre not yet known; guess likely moves
+[Turn 8] Evaluating known 1 moves for kyogre
+[Turn 8] Switch candidate hooh: resist_score -10.0, threat 165.6, hp_factor 100.0
+[Turn 8] All moves for kyogre not yet known; guess likely moves
+[Turn 8] Evaluating known 1 moves for kyogre
+[Turn 8] Switch candidate zaciancrowned: resist_score 16.0, threat 165.6, hp_factor 100.0
+[Turn 8] Sorted switch candidates:
+[Turn 8]   zaciancrowned: threat 165.6, hp_factor 100.0, resist_score 16.0, opp_may_KO False, opp_can_KO False
+[Turn 8]   necrozmaduskmane: threat 92.0, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 8]   hooh: threat 165.6, hp_factor 100.0, resist_score -10.0, opp_may_KO True, opp_can_KO False
+[Turn 8]   koraidon: threat 165.6, hp_factor 100.0, resist_score -12.0, opp_may_KO True, opp_can_KO False
+[Turn 8] Priority 7: Opponent threatens a KO; seeking a defensive switch.
+[Turn 9] Non-fainted Pokémon in team: 5
+[Turn 9] Active: zaciancrowned              (39.45% HP) vs                 kyogre                 (36.00% HP) with available moves                     behemothblade, playrough, closecombat, wildcharge
+[Turn 9] Assigning move ranks for opponent
+[Turn 9] Evaluating moves thunder, waterspout, originpulse, surf, icebeam, calmmind for kyogre vs zaciancrowned
+[Turn 9] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 9] Assigning move ranks for us
+[Turn 9] Evaluating moves behemothblade, playrough, closecombat, wildcharge for zaciancrowned vs kyogre
+[Turn 9] Move ranks for zaciancrowned vs kyogre: [{'move': behemothblade (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': playrough (Move object), 'effectiveness': 1, 'damage': 167.67000000000002, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': wildcharge (Move object), 'effectiveness': 2, 'damage': 248.4, 'recoildamage': 62.1, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 9] Priority 1: Securing KO on boosted threat kyogre with wildcharge.
+[Turn 9] Non-fainted Pokémon in team: 4
+[Turn 9] Active: zaciancrowned              (0.00% HP) vs                 kyogre                 (36.00% HP) with available moves                     None
+[Turn 9] Forced switch required
+[Turn 9] All moves for kyogre not yet known; guess likely moves
+[Turn 9] Evaluating known 1 moves for kyogre
+[Turn 9] Switch candidate koraidon: resist_score -12.0, threat 165.6, hp_factor 100.0
+[Turn 9] All moves for kyogre not yet known; guess likely moves
+[Turn 9] Evaluating known 1 moves for kyogre
+[Turn 9] Switch candidate necrozmaduskmane: resist_score 8.0, threat 92.0, hp_factor 100.0
+[Turn 9] All moves for kyogre not yet known; guess likely moves
+[Turn 9] Evaluating known 1 moves for kyogre
+[Turn 9] Switch candidate hooh: resist_score -10.0, threat 165.6, hp_factor 100.0
+[Turn 9] All moves for kyogre not yet known; guess likely moves
+[Turn 9] Evaluating known 1 moves for kyogre
+[Turn 9] Switch candidate kyogre: resist_score 8.0, threat 141.7, hp_factor 10.3
+[Turn 9] Sorted switch candidates:
+[Turn 9]   necrozmaduskmane: threat 92.0, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 9]   hooh: threat 165.6, hp_factor 100.0, resist_score -10.0, opp_may_KO True, opp_can_KO False
+[Turn 9]   koraidon: threat 165.6, hp_factor 100.0, resist_score -12.0, opp_may_KO True, opp_can_KO False
+[Turn 9]   kyogre: threat 141.7, hp_factor 10.3, resist_score 8.0, opp_may_KO False, opp_can_KO True
+[Turn 9] Forced switch -> necrozmaduskmane
+[Turn 10] Non-fainted Pokémon in team: 4
+[Turn 10] Active: necrozmaduskmane              (100.00% HP) vs                 kyogre                 (36.00% HP) with available moves                     sunsteelstrike, earthquake, stealthrock, morningsun
+[Turn 10] Assigning move ranks for opponent
+[Turn 10] Evaluating moves thunder, waterspout, originpulse, surf, icebeam, calmmind for kyogre vs necrozmaduskmane
+[Turn 10] Opponent dangerous: False, has boosts: False, faster: True, KO: False, opponent may have a ko move: False
+[Turn 10] Assigning move ranks for us
+[Turn 10] Evaluating moves sunsteelstrike, earthquake, stealthrock, morningsun for necrozmaduskmane vs kyogre
+[Turn 10] Move ranks for necrozmaduskmane vs kyogre: [{'move': sunsteelstrike (Move object), 'effectiveness': 0.5, 'damage': 69.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': earthquake (Move object), 'effectiveness': 1, 'damage': 92.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 10] Priority 1: Securing KO on boosted threat kyogre with earthquake.
+[Turn 11] Non-fainted Pokémon in team: 4
+[Turn 11] Active: necrozmaduskmane              (46.98% HP) vs                 koraidon                 (100.00% HP) with available moves                     sunsteelstrike, earthquake, stealthrock, morningsun
+[Turn 11] Opponent dangerous: False, has boosts: False, faster: True, KO: False, opponent may have a ko move: False
+[Turn 11] Assigning move ranks for us
+[Turn 11] Evaluating moves sunsteelstrike, earthquake, stealthrock, morningsun for necrozmaduskmane vs koraidon
+[Turn 11] Move ranks for necrozmaduskmane vs koraidon: [{'move': sunsteelstrike (Move object), 'effectiveness': 1, 'damage': 138.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': earthquake (Move object), 'effectiveness': 1, 'damage': 92.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 11] Analysis: Conditions are favorable for setting Stealth Rock.
+[Turn 11] Priority 2: Setting up Stealth Rock for move 'stealthrock'
+[Turn 11] Non-fainted Pokémon in team: 3
+[Turn 11] Active: necrozmaduskmane              (0.00% HP) vs                 koraidon                 (66.00% HP) with available moves                     None
+[Turn 11] Forced switch required
+[Turn 11] All moves for koraidon not yet known; guess likely moves
+[Turn 11] Evaluating known 1 moves for koraidon
+[Turn 11] Switch candidate koraidon: resist_score 32.0, threat 331.2, hp_factor 100.0
+[Turn 11] All moves for koraidon not yet known; guess likely moves
+[Turn 11] Evaluating known 1 moves for koraidon
+[Turn 11] Switch candidate hooh: resist_score 6.0, threat 331.2, hp_factor 100.0
+[Turn 11] All moves for koraidon not yet known; guess likely moves
+[Turn 11] Evaluating known 1 moves for koraidon
+[Turn 11] Switch candidate kyogre: resist_score 6.0, threat 165.6, hp_factor 10.3
+[Turn 11] Sorted switch candidates:
+[Turn 11]   koraidon: threat 331.2, hp_factor 100.0, resist_score 32.0, opp_may_KO True, opp_can_KO False
+[Turn 11]   hooh: threat 331.2, hp_factor 100.0, resist_score 6.0, opp_may_KO True, opp_can_KO False
+[Turn 11]   kyogre: threat 165.6, hp_factor 10.3, resist_score 6.0, opp_may_KO True, opp_can_KO False
+[Turn 11] Forced switch -> koraidon
+[Turn 12] Non-fainted Pokémon in team: 3
+[Turn 12] Active: koraidon              (100.00% HP) vs                 koraidon                 (66.00% HP) with available moves                     flareblitz, closecombat, outrage, uturn
+[Turn 12] Assigning move ranks for opponent
+[Turn 12] Evaluating moves flareblitz, scaleshot, dragonclaw, lowkick, closecombat, swordsdance, flamecharge, wildcharge, uturn for koraidon vs koraidon
+[Turn 12] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 12] Assigning move ranks for us
+[Turn 12] Evaluating moves flareblitz, closecombat, outrage, uturn for koraidon vs koraidon
+[Turn 12] Move ranks for koraidon vs koraidon: [{'move': flareblitz (Move object), 'effectiveness': 0.5, 'damage': 55.2, 'recoildamage': 18.216, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': outrage (Move object), 'effectiveness': 2, 'damage': 331.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': uturn (Move object), 'effectiveness': 0.5, 'damage': 32.2, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 12] Priority 4: Securing standard KO on koraidon with outrage.
+[Turn 13] Non-fainted Pokémon in team: 3
+[Turn 13] Active: koraidon              (100.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     outrage
+[Turn 13] Opponent dangerous: False, has boosts: True, faster: True, KO: False, opponent may have a ko move: False
+[Turn 13] Assigning move ranks for us
+[Turn 13] Evaluating moves outrage for koraidon vs zaciancrowned
+[Turn 13] Move ranks for koraidon vs zaciancrowned: [{'move': outrage (Move object), 'effectiveness': 0.0, 'damage': 0.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 13] Priority 8: No other conditions met; using best available move outrage.
+[Turn 14] Non-fainted Pokémon in team: 3
+[Turn 14] Active: koraidon              (100.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     outrage
+[Turn 14] Assigning move ranks for opponent
+[Turn 14] Evaluating moves playrough, behemothblade, closecombat, swordsdance, wildcharge, crunch for zaciancrowned vs koraidon
+[Turn 14] Opponent dangerous: True, has boosts: True, faster: True, KO: True, opponent may have a ko move: False
+[Turn 14] Assigning move ranks for us
+[Turn 14] Evaluating moves outrage for koraidon vs zaciancrowned
+[Turn 14] Move ranks for koraidon vs zaciancrowned: [{'move': outrage (Move object), 'effectiveness': 0.0, 'damage': 0.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 14] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 14] Evaluating known 1 moves for zaciancrowned
+[Turn 14] Switch candidate hooh: resist_score -2.0, threat 262.2, hp_factor 100.0
+[Turn 14] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 14] Evaluating known 1 moves for zaciancrowned
+[Turn 14] Switch candidate kyogre: resist_score -10.0, threat 207.0, hp_factor 10.3
+[Turn 14] Sorted switch candidates:
+[Turn 14]   hooh: threat 262.2, hp_factor 100.0, resist_score -2.0, opp_may_KO True, opp_can_KO False
+[Turn 14]   kyogre: threat 207.0, hp_factor 10.3, resist_score -10.0, opp_may_KO True, opp_can_KO True
+[Turn 14] Priority 7: Opponent threatens a KO; seeking a defensive switch.
+[Turn 15] Non-fainted Pokémon in team: 3
+[Turn 15] Active: hooh              (62.17% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     sacredfire, bravebird, earthquake, recover
+[Turn 15] Assigning move ranks for opponent
+[Turn 15] Evaluating moves playrough, wildcharge, crunch, swordsdance, behemothblade, closecombat for zaciancrowned vs hooh
+[Turn 15] Opponent dangerous: False, has boosts: True, faster: True, KO: False, opponent may have a ko move: False
+[Turn 15] Assigning move ranks for us
+[Turn 15] Evaluating moves sacredfire, bravebird, earthquake, recover for hooh vs zaciancrowned
+[Turn 15] Move ranks for hooh vs zaciancrowned: [{'move': sacredfire (Move object), 'effectiveness': 2, 'damage': 262.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': bravebird (Move object), 'effectiveness': 0.5, 'damage': 82.8, 'recoildamage': 27.324, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': earthquake (Move object), 'effectiveness': 2, 'damage': 184.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 15] Priority 1: Securing KO on boosted threat zaciancrowned with sacredfire.
+[Turn 15] Non-fainted Pokémon in team: 2
+[Turn 15] Active: hooh              (0.00% HP) vs                 zaciancrowned                 (81.00% HP) with available moves                     None
+[Turn 15] Forced switch required
+[Turn 15] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 15] Evaluating known 2 moves for zaciancrowned
+[Turn 15] Switch candidate koraidon: resist_score 8.0, threat 220.8, hp_factor 100.0
+[Turn 15] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 15] Evaluating known 2 moves for zaciancrowned
+[Turn 15] Switch candidate kyogre: resist_score 0.0, threat 207.0, hp_factor 10.3
+[Turn 15] Sorted switch candidates:
+[Turn 15]   koraidon: threat 220.8, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO True
+[Turn 15]   kyogre: threat 207.0, hp_factor 10.3, resist_score 0.0, opp_may_KO False, opp_can_KO True
+[Turn 15] Forced switch -> koraidon
+[Turn 16] Non-fainted Pokémon in team: 2
+[Turn 16] Active: koraidon              (100.00% HP) vs                 zaciancrowned                 (81.00% HP) with available moves                     flareblitz, closecombat, outrage, uturn
+[Turn 16] Assigning move ranks for opponent
+[Turn 16] Evaluating moves playrough, wildcharge, behemothblade, closecombat, swordsdance, crunch for zaciancrowned vs koraidon
+[Turn 16] Opponent dangerous: True, has boosts: True, faster: True, KO: True, opponent may have a ko move: False
+[Turn 16] Assigning move ranks for us
+[Turn 16] Evaluating moves flareblitz, closecombat, outrage, uturn for koraidon vs zaciancrowned
+[Turn 16] Move ranks for koraidon vs zaciancrowned: [{'move': flareblitz (Move object), 'effectiveness': 2, 'damage': 220.8, 'recoildamage': 72.864, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1.0, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': outrage (Move object), 'effectiveness': 0.0, 'damage': 0.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': uturn (Move object), 'effectiveness': 0.25, 'damage': 16.1, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 16] Priority 1: Securing KO on boosted threat zaciancrowned with flareblitz.
+[Turn 17] Non-fainted Pokémon in team: 2
+[Turn 17] Active: koraidon              (74.78% HP) vs                 necrozmaduskmane                 (100.00% HP) with available moves                     flareblitz
+[Turn 17] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 17] Assigning move ranks for us
+[Turn 17] Evaluating moves flareblitz for koraidon vs necrozmaduskmane
+[Turn 17] Move ranks for koraidon vs necrozmaduskmane: [{'move': flareblitz (Move object), 'effectiveness': 2, 'damage': 220.8, 'recoildamage': 72.864, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 17] Priority 4: Securing standard KO on necrozmaduskmane with flareblitz.
+[Turn 18] Non-fainted Pokémon in team: 2
+[Turn 18] Active: koraidon              (19.94% HP) vs                 arceusground                 (100.00% HP) with available moves                     flareblitz
+[Turn 18] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 18] Assigning move ranks for us
+[Turn 18] Evaluating moves flareblitz for koraidon vs arceusground
+[Turn 18] Move ranks for koraidon vs arceusground: [{'move': flareblitz (Move object), 'effectiveness': 1, 'damage': 110.4, 'recoildamage': 36.432, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 18] Priority 4: Securing standard KO on arceusground with flareblitz.
+[Turn 18] Non-fainted Pokémon in team: 1
+[Turn 18] Active: koraidon              (0.00% HP) vs                 arceusground                 (17.00% HP) with available moves                     None
+[Turn 18] Forced switch required
+[Turn 18] All moves for arceusground not yet known; guess likely moves
+[Turn 18] Evaluating known 1 moves for arceusground
+[Turn 18] Switch candidate kyogre: resist_score 8.0, threat 414.0, hp_factor 10.3
+[Turn 18] Sorted switch candidates:
+[Turn 18]   kyogre: threat 414.0, hp_factor 10.3, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 18] Forced switch -> kyogre
+[Turn 19] Non-fainted Pokémon in team: 1
+[Turn 19] Active: kyogre              (10.26% HP) vs                 arceusground                 (17.00% HP) with available moves                     waterspout, originpulse, icebeam, thunder
+[Turn 19] Assigning move ranks for opponent
+[Turn 19] Evaluating moves icebeam, judgment, earthpower, calmmind, recover, stoneedge for arceusground vs kyogre
+[Turn 19] Opponent dangerous: True, has boosts: False, faster: True, KO: False, opponent may have a ko move: False
+[Turn 19] Assigning move ranks for us
+[Turn 19] Evaluating moves waterspout, originpulse, icebeam, thunder for kyogre vs arceusground
+[Turn 19] Move ranks for kyogre vs arceusground: [{'move': waterspout (Move object), 'effectiveness': 2, 'damage': 414.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': originpulse (Move object), 'effectiveness': 2, 'damage': 258.06, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 2, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': thunder (Move object), 'effectiveness': 0, 'damage': 0.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 19] Priority 1: Securing KO on boosted threat arceusground with waterspout.
+[Turn 1] Non-fainted Pokémon in team: 6
+[Turn 1] Active: koraidon              (100.00% HP) vs                 koraidon                 (100.00% HP) with available moves                     flareblitz, closecombat, outrage, uturn
+[Turn 1] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 1] Assigning move ranks for us
+[Turn 1] Evaluating moves flareblitz, closecombat, outrage, uturn for koraidon vs koraidon
+[Turn 1] Move ranks for koraidon vs koraidon: [{'move': flareblitz (Move object), 'effectiveness': 0.5, 'damage': 55.2, 'recoildamage': 18.216, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': outrage (Move object), 'effectiveness': 2, 'damage': 331.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': uturn (Move object), 'effectiveness': 0.5, 'damage': 32.2, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 1] Priority 4: Securing standard KO on koraidon with outrage.
+[Turn 2] Non-fainted Pokémon in team: 6
+[Turn 2] Active: koraidon              (100.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     outrage
+[Turn 2] Opponent dangerous: False, has boosts: True, faster: True, KO: False, opponent may have a ko move: False
+[Turn 2] Assigning move ranks for us
+[Turn 2] Evaluating moves outrage for koraidon vs zaciancrowned
+[Turn 2] Move ranks for koraidon vs zaciancrowned: [{'move': outrage (Move object), 'effectiveness': 0.0, 'damage': 0.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 2] Priority 8: No other conditions met; using best available move outrage.
+[Turn 2] Non-fainted Pokémon in team: 5
+[Turn 2] Active: koraidon              (0.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     None
+[Turn 2] Forced switch required
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate kyogre: resist_score -10.0, threat 207.0, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate necrozmaduskmane: resist_score -2.0, threat 184.0, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate zaciancrowned: resist_score 16.0, threat 138.0, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate arceusground: resist_score -10.0, threat 46.0, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate hooh: resist_score 8.0, threat 262.2, hp_factor 100.0
+[Turn 2] Sorted switch candidates:
+[Turn 2]   hooh: threat 262.2, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   kyogre: threat 207.0, hp_factor 100.0, resist_score -10.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   zaciancrowned: threat 138.0, hp_factor 100.0, resist_score 16.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   arceusground: threat 46.0, hp_factor 100.0, resist_score -10.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   necrozmaduskmane: threat 184.0, hp_factor 100.0, resist_score -2.0, opp_may_KO True, opp_can_KO False
+[Turn 2] Forced switch -> hooh
+[Turn 3] Non-fainted Pokémon in team: 5
+[Turn 3] Active: hooh              (100.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     sacredfire, bravebird, earthquake, recover
+[Turn 3] Assigning move ranks for opponent
+[Turn 3] Evaluating moves playrough, crunch, swordsdance, behemothblade, closecombat for zaciancrowned vs hooh
+[Turn 3] Opponent dangerous: False, has boosts: True, faster: True, KO: False, opponent may have a ko move: False
+[Turn 3] Assigning move ranks for us
+[Turn 3] Evaluating moves sacredfire, bravebird, earthquake, recover for hooh vs zaciancrowned
+[Turn 3] Move ranks for hooh vs zaciancrowned: [{'move': sacredfire (Move object), 'effectiveness': 2, 'damage': 262.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': bravebird (Move object), 'effectiveness': 0.5, 'damage': 82.8, 'recoildamage': 27.324, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': earthquake (Move object), 'effectiveness': 2, 'damage': 184.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 3] Priority 1: Securing KO on boosted threat zaciancrowned with sacredfire.
+[Turn 4] Non-fainted Pokémon in team: 5
+[Turn 4] Active: hooh              (5.06% HP) vs                 kyogre                 (100.00% HP) with available moves                     sacredfire, bravebird, earthquake, recover
+[Turn 4] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 4] Assigning move ranks for us
+[Turn 4] Evaluating moves sacredfire, bravebird, earthquake, recover for hooh vs kyogre
+[Turn 4] Move ranks for hooh vs kyogre: [{'move': sacredfire (Move object), 'effectiveness': 0.5, 'damage': 65.55, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': bravebird (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 54.648, 'can_KO': True, 'can_recoil_KO': True, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': earthquake (Move object), 'effectiveness': 1, 'damage': 92.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 4] Analysis: hooh is a key mon; preserving it with healing.
+[Turn 4] Priority 3: Healing hooh with recover.
+[Turn 4] Non-fainted Pokémon in team: 4
+[Turn 4] Active: hooh              (0.00% HP) vs                 kyogre                 (100.00% HP) with available moves                     None
+[Turn 4] Forced switch required
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate kyogre: resist_score 8.0, threat 141.7, hp_factor 100.0
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate necrozmaduskmane: resist_score -2.0, threat 92.0, hp_factor 100.0
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate zaciancrowned: resist_score 6.0, threat 165.6, hp_factor 100.0
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate arceusground: resist_score -20.0, threat 92.0, hp_factor 100.0
+[Turn 4] Sorted switch candidates:
+[Turn 4]   zaciancrowned: threat 165.6, hp_factor 100.0, resist_score 6.0, opp_may_KO False, opp_can_KO False
+[Turn 4]   kyogre: threat 141.7, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 4]   necrozmaduskmane: threat 92.0, hp_factor 100.0, resist_score -2.0, opp_may_KO False, opp_can_KO False
+[Turn 4]   arceusground: threat 92.0, hp_factor 100.0, resist_score -20.0, opp_may_KO True, opp_can_KO False
+[Turn 4] Forced switch -> zaciancrowned
+[Turn 5] Non-fainted Pokémon in team: 4
+[Turn 5] Active: zaciancrowned              (100.00% HP) vs                 kyogre                 (100.00% HP) with available moves                     behemothblade, playrough, closecombat, wildcharge
+[Turn 5] Assigning move ranks for opponent
+[Turn 5] Evaluating moves waterspout, originpulse, surf, icebeam, calmmind for kyogre vs zaciancrowned
+[Turn 5] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 5] Assigning move ranks for us
+[Turn 5] Evaluating moves behemothblade, playrough, closecombat, wildcharge for zaciancrowned vs kyogre
+[Turn 5] Move ranks for zaciancrowned vs kyogre: [{'move': behemothblade (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': playrough (Move object), 'effectiveness': 1, 'damage': 167.67000000000002, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': wildcharge (Move object), 'effectiveness': 2, 'damage': 248.4, 'recoildamage': 62.1, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 5] Priority 4: Securing standard KO on kyogre with wildcharge.
+[Turn 6] Non-fainted Pokémon in team: 4
+[Turn 6] Active: zaciancrowned              (69.11% HP) vs                 hooh                 (100.00% HP) with available moves                     behemothblade, playrough, closecombat, wildcharge
+[Turn 6] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 6] Assigning move ranks for us
+[Turn 6] Evaluating moves behemothblade, playrough, closecombat, wildcharge for zaciancrowned vs hooh
+[Turn 6] Move ranks for zaciancrowned vs hooh: [{'move': behemothblade (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': playrough (Move object), 'effectiveness': 0.5, 'damage': 83.83500000000001, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 0.5, 'damage': 82.8, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': wildcharge (Move object), 'effectiveness': 2, 'damage': 248.4, 'recoildamage': 62.1, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 6] Priority 4: Securing standard KO on hooh with wildcharge.
+[Turn 7] Non-fainted Pokémon in team: 4
+[Turn 7] Active: zaciancrowned              (41.90% HP) vs                 necrozmaduskmane                 (100.00% HP) with available moves                     behemothblade, playrough, closecombat, wildcharge
+[Turn 7] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 7] Assigning move ranks for us
+[Turn 7] Evaluating moves behemothblade, playrough, closecombat, wildcharge for zaciancrowned vs necrozmaduskmane
+[Turn 7] Move ranks for zaciancrowned vs necrozmaduskmane: [{'move': behemothblade (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': playrough (Move object), 'effectiveness': 0.5, 'damage': 83.83500000000001, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1.0, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': wildcharge (Move object), 'effectiveness': 1, 'damage': 124.2, 'recoildamage': 31.05, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 7] Priority 4: Securing standard KO on necrozmaduskmane with closecombat.
+[Turn 7] Non-fainted Pokémon in team: 3
+[Turn 7] Active: zaciancrowned              (0.00% HP) vs                 necrozmaduskmane                 (52.00% HP) with available moves                     None
+[Turn 7] Forced switch required
+[Turn 7] All moves for necrozmaduskmane not yet known; guess likely moves
+[Turn 7] Evaluating known 1 moves for necrozmaduskmane
+[Turn 7] Switch candidate kyogre: resist_score 0.0, threat 207.0, hp_factor 100.0
+[Turn 7] All moves for necrozmaduskmane not yet known; guess likely moves
+[Turn 7] Evaluating known 1 moves for necrozmaduskmane
+[Turn 7] Switch candidate necrozmaduskmane: resist_score 22.0, threat 184.0, hp_factor 100.0
+[Turn 7] All moves for necrozmaduskmane not yet known; guess likely moves
+[Turn 7] Evaluating known 1 moves for necrozmaduskmane
+[Turn 7] Switch candidate arceusground: resist_score 16.0, threat 46.0, hp_factor 100.0
+[Turn 7] Sorted switch candidates:
+[Turn 7]   kyogre: threat 207.0, hp_factor 100.0, resist_score 0.0, opp_may_KO False, opp_can_KO False
+[Turn 7]   necrozmaduskmane: threat 184.0, hp_factor 100.0, resist_score 22.0, opp_may_KO False, opp_can_KO False
+[Turn 7]   arceusground: threat 46.0, hp_factor 100.0, resist_score 16.0, opp_may_KO False, opp_can_KO False
+[Turn 7] Forced switch -> kyogre
+[Turn 8] Non-fainted Pokémon in team: 3
+[Turn 8] Active: kyogre              (100.00% HP) vs                 necrozmaduskmane                 (52.00% HP) with available moves                     waterspout, originpulse, icebeam, thunder
+[Turn 8] Assigning move ranks for opponent
+[Turn 8] Evaluating moves earthquake, morningsun, stealthrock, dragonclaw, stoneedge, sunsteelstrike for necrozmaduskmane vs kyogre
+[Turn 8] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 8] Assigning move ranks for us
+[Turn 8] Evaluating moves waterspout, originpulse, icebeam, thunder for kyogre vs necrozmaduskmane
+[Turn 8] Move ranks for kyogre vs necrozmaduskmane: [{'move': waterspout (Move object), 'effectiveness': 1, 'damage': 207.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': originpulse (Move object), 'effectiveness': 1, 'damage': 129.03, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 0.5, 'damage': 41.4, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': thunder (Move object), 'effectiveness': 1, 'damage': 70.84, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 8] Priority 4: Securing standard KO on necrozmaduskmane with waterspout.
+[Turn 9] Non-fainted Pokémon in team: 3
+[Turn 9] Active: kyogre              (100.00% HP) vs                 arceusground                 (100.00% HP) with available moves                     waterspout
+[Turn 9] Opponent dangerous: False, has boosts: False, faster: True, KO: False, opponent may have a ko move: False
+[Turn 9] Assigning move ranks for us
+[Turn 9] Evaluating moves waterspout for kyogre vs arceusground
+[Turn 9] Move ranks for kyogre vs arceusground: [{'move': waterspout (Move object), 'effectiveness': 2, 'damage': 414.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 9] Priority 4: Securing standard KO on arceusground with waterspout.
+[Turn 1] Non-fainted Pokémon in team: 6
+[Turn 1] Active: koraidon              (100.00% HP) vs                 hooh                 (100.00% HP) with available moves                     flareblitz, closecombat, outrage, uturn
+[Turn 1] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 1] Assigning move ranks for us
+[Turn 1] Evaluating moves flareblitz, closecombat, outrage, uturn for koraidon vs hooh
+[Turn 1] Move ranks for koraidon vs hooh: [{'move': flareblitz (Move object), 'effectiveness': 0.5, 'damage': 55.2, 'recoildamage': 18.216, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 0.5, 'damage': 82.8, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': outrage (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': uturn (Move object), 'effectiveness': 0.25, 'damage': 16.1, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 1] Priority 4: Securing standard KO on hooh with outrage.
+[Turn 2] Non-fainted Pokémon in team: 6
+[Turn 2] Active: koraidon              (100.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     outrage
+[Turn 2] Opponent dangerous: False, has boosts: True, faster: True, KO: False, opponent may have a ko move: False
+[Turn 2] Assigning move ranks for us
+[Turn 2] Evaluating moves outrage for koraidon vs zaciancrowned
+[Turn 2] Move ranks for koraidon vs zaciancrowned: [{'move': outrage (Move object), 'effectiveness': 0.0, 'damage': 0.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 2] Priority 8: No other conditions met; using best available move outrage.
+[Turn 2] Non-fainted Pokémon in team: 5
+[Turn 2] Active: koraidon              (0.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     None
+[Turn 2] Forced switch required
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate necrozmaduskmane: resist_score -2.0, threat 184.0, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate hooh: resist_score 8.0, threat 262.2, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate zaciancrowned: resist_score 16.0, threat 138.0, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate arceusground: resist_score -10.0, threat 46.0, hp_factor 100.0
+[Turn 2] All moves for zaciancrowned not yet known; guess likely moves
+[Turn 2] Evaluating known 1 moves for zaciancrowned
+[Turn 2] Switch candidate kyogre: resist_score -10.0, threat 207.0, hp_factor 100.0
+[Turn 2] Sorted switch candidates:
+[Turn 2]   hooh: threat 262.2, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   kyogre: threat 207.0, hp_factor 100.0, resist_score -10.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   zaciancrowned: threat 138.0, hp_factor 100.0, resist_score 16.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   arceusground: threat 46.0, hp_factor 100.0, resist_score -10.0, opp_may_KO False, opp_can_KO False
+[Turn 2]   necrozmaduskmane: threat 184.0, hp_factor 100.0, resist_score -2.0, opp_may_KO True, opp_can_KO False
+[Turn 2] Forced switch -> hooh
+[Turn 3] Non-fainted Pokémon in team: 5
+[Turn 3] Active: hooh              (100.00% HP) vs                 zaciancrowned                 (100.00% HP) with available moves                     sacredfire, bravebird, earthquake, recover
+[Turn 3] Assigning move ranks for opponent
+[Turn 3] Evaluating moves playrough, crunch, swordsdance, behemothblade, closecombat for zaciancrowned vs hooh
+[Turn 3] Opponent dangerous: False, has boosts: True, faster: True, KO: False, opponent may have a ko move: False
+[Turn 3] Assigning move ranks for us
+[Turn 3] Evaluating moves sacredfire, bravebird, earthquake, recover for hooh vs zaciancrowned
+[Turn 3] Move ranks for hooh vs zaciancrowned: [{'move': sacredfire (Move object), 'effectiveness': 2, 'damage': 262.2, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': bravebird (Move object), 'effectiveness': 0.5, 'damage': 82.8, 'recoildamage': 27.324, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': earthquake (Move object), 'effectiveness': 2, 'damage': 184.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 3] Priority 1: Securing KO on boosted threat zaciancrowned with sacredfire.
+[Turn 4] Non-fainted Pokémon in team: 5
+[Turn 4] Active: hooh              (4.10% HP) vs                 kyogre                 (100.00% HP) with available moves                     sacredfire, bravebird, earthquake, recover
+[Turn 4] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 4] Assigning move ranks for us
+[Turn 4] Evaluating moves sacredfire, bravebird, earthquake, recover for hooh vs kyogre
+[Turn 4] Move ranks for hooh vs kyogre: [{'move': sacredfire (Move object), 'effectiveness': 0.5, 'damage': 65.55, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': bravebird (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 54.648, 'can_KO': True, 'can_recoil_KO': True, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': earthquake (Move object), 'effectiveness': 1, 'damage': 92.0, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 4] Analysis: hooh is a key mon; preserving it with healing.
+[Turn 4] Priority 3: Healing hooh with recover.
+[Turn 4] Non-fainted Pokémon in team: 4
+[Turn 4] Active: hooh              (0.00% HP) vs                 kyogre                 (100.00% HP) with available moves                     None
+[Turn 4] Forced switch required
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate necrozmaduskmane: resist_score -2.0, threat 92.0, hp_factor 100.0
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate zaciancrowned: resist_score 6.0, threat 165.6, hp_factor 100.0
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate arceusground: resist_score -20.0, threat 92.0, hp_factor 100.0
+[Turn 4] All moves for kyogre not yet known; guess likely moves
+[Turn 4] Evaluating known 1 moves for kyogre
+[Turn 4] Switch candidate kyogre: resist_score 8.0, threat 141.7, hp_factor 100.0
+[Turn 4] Sorted switch candidates:
+[Turn 4]   zaciancrowned: threat 165.6, hp_factor 100.0, resist_score 6.0, opp_may_KO False, opp_can_KO False
+[Turn 4]   kyogre: threat 141.7, hp_factor 100.0, resist_score 8.0, opp_may_KO False, opp_can_KO False
+[Turn 4]   necrozmaduskmane: threat 92.0, hp_factor 100.0, resist_score -2.0, opp_may_KO False, opp_can_KO False
+[Turn 4]   arceusground: threat 92.0, hp_factor 100.0, resist_score -20.0, opp_may_KO True, opp_can_KO False
+[Turn 4] Forced switch -> zaciancrowned
+[Turn 5] Non-fainted Pokémon in team: 4
+[Turn 5] Active: zaciancrowned              (100.00% HP) vs                 kyogre                 (100.00% HP) with available moves                     behemothblade, playrough, closecombat, wildcharge
+[Turn 5] Assigning move ranks for opponent
+[Turn 5] Evaluating moves waterspout, originpulse, surf, icebeam, calmmind for kyogre vs zaciancrowned
+[Turn 5] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 5] Assigning move ranks for us
+[Turn 5] Evaluating moves behemothblade, playrough, closecombat, wildcharge for zaciancrowned vs kyogre
+[Turn 5] Move ranks for zaciancrowned vs kyogre: [{'move': behemothblade (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': playrough (Move object), 'effectiveness': 1, 'damage': 167.67000000000002, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': wildcharge (Move object), 'effectiveness': 2, 'damage': 248.4, 'recoildamage': 62.1, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 5] Priority 4: Securing standard KO on kyogre with wildcharge.
+[Turn 6] Non-fainted Pokémon in team: 4
+[Turn 6] Active: zaciancrowned              (69.11% HP) vs                 koraidon                 (100.00% HP) with available moves                     behemothblade, playrough, closecombat, wildcharge
+[Turn 6] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 6] Assigning move ranks for us
+[Turn 6] Evaluating moves behemothblade, playrough, closecombat, wildcharge for zaciancrowned vs koraidon
+[Turn 6] Move ranks for zaciancrowned vs koraidon: [{'move': behemothblade (Move object), 'effectiveness': 1, 'damage': 207.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': playrough (Move object), 'effectiveness': 4, 'damage': 670.6800000000001, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': wildcharge (Move object), 'effectiveness': 0.5, 'damage': 62.1, 'recoildamage': 15.525, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 6] Priority 4: Securing standard KO on koraidon with playrough.
+[Turn 7] Non-fainted Pokémon in team: 4
+[Turn 7] Active: zaciancrowned              (69.11% HP) vs                 necrozmaduskmane                 (100.00% HP) with available moves                     behemothblade, playrough, closecombat, wildcharge
+[Turn 7] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 7] Assigning move ranks for us
+[Turn 7] Evaluating moves behemothblade, playrough, closecombat, wildcharge for zaciancrowned vs necrozmaduskmane
+[Turn 7] Move ranks for zaciancrowned vs necrozmaduskmane: [{'move': behemothblade (Move object), 'effectiveness': 0.5, 'damage': 103.5, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': playrough (Move object), 'effectiveness': 0.5, 'damage': 83.83500000000001, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': closecombat (Move object), 'effectiveness': 1.0, 'damage': 165.6, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': wildcharge (Move object), 'effectiveness': 1, 'damage': 124.2, 'recoildamage': 31.05, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 7] Priority 4: Securing standard KO on necrozmaduskmane with closecombat.
+[Turn 7] Non-fainted Pokémon in team: 3
+[Turn 7] Active: zaciancrowned              (0.00% HP) vs                 necrozmaduskmane                 (54.00% HP) with available moves                     None
+[Turn 7] Forced switch required
+[Turn 7] All moves for necrozmaduskmane not yet known; guess likely moves
+[Turn 7] Evaluating known 1 moves for necrozmaduskmane
+[Turn 7] Switch candidate necrozmaduskmane: resist_score 22.0, threat 184.0, hp_factor 100.0
+[Turn 7] All moves for necrozmaduskmane not yet known; guess likely moves
+[Turn 7] Evaluating known 1 moves for necrozmaduskmane
+[Turn 7] Switch candidate arceusground: resist_score 16.0, threat 46.0, hp_factor 100.0
+[Turn 7] All moves for necrozmaduskmane not yet known; guess likely moves
+[Turn 7] Evaluating known 1 moves for necrozmaduskmane
+[Turn 7] Switch candidate kyogre: resist_score 0.0, threat 207.0, hp_factor 100.0
+[Turn 7] Sorted switch candidates:
+[Turn 7]   kyogre: threat 207.0, hp_factor 100.0, resist_score 0.0, opp_may_KO False, opp_can_KO False
+[Turn 7]   necrozmaduskmane: threat 184.0, hp_factor 100.0, resist_score 22.0, opp_may_KO False, opp_can_KO False
+[Turn 7]   arceusground: threat 46.0, hp_factor 100.0, resist_score 16.0, opp_may_KO False, opp_can_KO False
+[Turn 7] Forced switch -> kyogre
+[Turn 8] Non-fainted Pokémon in team: 3
+[Turn 8] Active: kyogre              (100.00% HP) vs                 necrozmaduskmane                 (54.00% HP) with available moves                     waterspout, originpulse, icebeam, thunder
+[Turn 8] Assigning move ranks for opponent
+[Turn 8] Evaluating moves earthquake, morningsun, stealthrock, dragonclaw, stoneedge, sunsteelstrike for necrozmaduskmane vs kyogre
+[Turn 8] Opponent dangerous: False, has boosts: False, faster: False, KO: False, opponent may have a ko move: False
+[Turn 8] Assigning move ranks for us
+[Turn 8] Evaluating moves waterspout, originpulse, icebeam, thunder for kyogre vs necrozmaduskmane
+[Turn 8] Move ranks for kyogre vs necrozmaduskmane: [{'move': waterspout (Move object), 'effectiveness': 1, 'damage': 207.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': originpulse (Move object), 'effectiveness': 1, 'damage': 129.03, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}, {'move': icebeam (Move object), 'effectiveness': 0.5, 'damage': 41.4, 'recoildamage': 0.0, 'can_KO': False, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': True, 'is_neutral': False, 'is_status': False, 'may_KO': False}, {'move': thunder (Move object), 'effectiveness': 1, 'damage': 70.84, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': False, 'is_resisted': False, 'is_neutral': True, 'is_status': False, 'may_KO': False}]
+[Turn 8] Priority 4: Securing standard KO on necrozmaduskmane with waterspout.
+[Turn 9] Non-fainted Pokémon in team: 3
+[Turn 9] Active: kyogre              (100.00% HP) vs                 arceusground                 (100.00% HP) with available moves                     waterspout
+[Turn 9] Opponent dangerous: False, has boosts: False, faster: True, KO: False, opponent may have a ko move: False
+[Turn 9] Assigning move ranks for us
+[Turn 9] Evaluating moves waterspout for kyogre vs arceusground
+[Turn 9] Move ranks for kyogre vs arceusground: [{'move': waterspout (Move object), 'effectiveness': 2, 'damage': 414.0, 'recoildamage': 0.0, 'can_KO': True, 'can_recoil_KO': False, 'is_super_effective': True, 'is_resisted': False, 'is_neutral': False, 'is_status': False, 'may_KO': False}]
+[Turn 9] Priority 4: Securing standard KO on arceusground with waterspout.
