@@ -8,6 +8,8 @@ from poke_env.battle.pokemon import Pokemon
 from poke_env.battle.move import Move
 from poke_env.battle.pokemon_type import PokemonType
 from poke_env.player import Player
+import datetime
+import os
 
 team = """
 Necrozma-Dusk-Mane @ Rocky Helmet  
@@ -624,7 +626,7 @@ class OpponentModel:
         move_effects.sort(key=lambda x: x["effectiveness"], reverse=True)
         # Return as list of (effectiveness, move_name)
         ranked = [(m["effectiveness"], m["name"]) for m in move_effects]
-        print(len(moves), "plausible moves for", attacker.species, "vs", defender.species, "->", ranked)
+        #print(len(moves), "plausible moves for", attacker.species, "vs", defender.species, "->", ranked)
         return ranked
 
 
@@ -632,16 +634,20 @@ class CustomAgent(Player):
     def __init__(self, *args, **kwargs):
         super().__init__(team=team, *args, **kwargs)
         self.opp_model = OpponentModel()
-        self.debug = True # Turn off to silence reasoning logs
+        self.debug = False  # Turn off to silence reasoning logs
 
-        # Track our nominated win conditions (species we want to preserve)???
-        #self.win_cons: List[str] = ["Zacian-Crowned", "Kyogre", "Arceus-Fairy"]
 
     # ---- Explanation module ----
     def log(self, battle: AbstractBattle, msg: str):
         if self.debug:
-            print(f"[Turn {battle.turn}] {msg}")
-            with open("battle_loghiqb269_v4.txt", "a") as f:
+            #print(f"[Turn {battle.turn}] {msg}")
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            log_dir = "hiqb269v4logs"
+            os.makedirs(log_dir, exist_ok=True)
+            if not hasattr(self, "_log_filename"):
+                self._log_filename = f"{log_dir}/battle_loghiqb269_v4_{timestamp}.txt"
+            filename = self._log_filename
+            with open(filename, "a") as f:
                 f.write(f"[Turn {battle.turn}] {msg}\n")
 
 
@@ -692,7 +698,7 @@ class CustomAgent(Player):
         attack_move_exists = best_move_info["is_super_effective"] if best_move_info else False
 
         # PRIORITY 1: SECURE A KO ON A MAJOR THREAT
-        if best_move and can_ko and (major_threat or opp_is_ko):
+        if best_move and can_ko and (major_threat or opp_is_ko or opp.current_hp_fraction <= 0.5):
             self.log(battle, f"Priority 1: Securing KO on boosted threat {battle.opponent_active_pokemon.species} with {best_move.id}.")
             return self.create_order(best_move)
         
@@ -711,7 +717,7 @@ class CustomAgent(Player):
                 return self.create_order(heal_move)
 
         # PRIORITY 4: TAKE ANY OTHER GUARANTEED KO
-        if best_move and (can_ko or attack_move_exists): # check for attack move existing?
+        if best_move and (can_ko or attack_move_exists):
             recoildamage = best_move_info.get("recoilDamage", 0) if best_move_info else 0
             if recoildamage and recoildamage >= opp.current_hp:
                  self.log(battle, f"Skipping KO with {best_move.id} due to self-KO recoil risk.")
@@ -738,7 +744,7 @@ class CustomAgent(Player):
             return self.create_order(pivot_move)
 
         # PRIORITY 7: MAKE A DEFENSIVE SWITCH
-        if (opp_is_ko or (opp_faster and opp_dangerous)) and best_switch: #TODO also check for faster and attack move
+        if (opp_is_ko or (opp_faster and opp_dangerous)) and best_switch:
             self.log(battle, f"Priority 7: Opponent threatens a KO; seeking a defensive switch.")
             return self.create_order(best_switch)
 
