@@ -484,14 +484,6 @@ def predict_effectiveness(atk_type: Optional[str], def_types: List[str]) -> floa
         mult *= chart_row.get(dt, 1.0)
     return mult
 
-#UNUSED
-def effectiveness(move: Move, defender: Pokemon) -> float:
-    if not move or not defender.types:
-        return 1.0
-    mult = 1.0
-    mult = defender.damage_multiplier(move) 
-    return mult
-
 
 def has_stab(move_type: str, attacker: Pokemon) -> bool:
     if not move_type:
@@ -549,16 +541,6 @@ def is_healing_move(m: Move) -> bool:
     name = m.id
     return name in {"recover", "roost", "slackoff", "softboiled", "moonlight", "morningsun", "synthesis", "rest"}
 
-#UNUSED
-def is_removal_move(m: Move) -> bool:
-    name = m.id
-    return name in {"rapidspin", "defog", "mortalspin"}
-
-#UNUSED
-def would_be_ineffective(move: Move, defender: Pokemon) -> bool:
-    atk_type = move_type_name(move)
-    eff = defender.damage_multiplier(move)  # use built-in method if available
-    return eff == 0.0
 
 def can_heal(p: Pokemon) -> Optional[Move]:
     if not p or p.fainted:
@@ -567,20 +549,6 @@ def can_heal(p: Pokemon) -> Optional[Move]:
         if m and is_healing_move(m):
             return m
     return None
-
-#Used in an UNUSED function
-def has_our_hazards(battle: AbstractBattle) -> bool:
-    side = battle.side_conditions
-    return any(k in side for k in ["spikes", "toxicspikes", "stealthrock", "stickyweb"])
-
-#UNUSED
-def has_opp_hazards(battle: AbstractBattle) -> bool:
-    opp = battle.opponent_side_conditions
-    return any(k in opp for k in ["spikes", "toxicspikes", "stealthrock", "stickyweb"])
-
-#UNUSED
-def rocks_up_for_opp(battle: AbstractBattle) -> bool:
-    return "stealthrock" in battle.opponent_side_conditions
 
 
 class OpponentModel:
@@ -833,6 +801,25 @@ class CustomAgent(Player):
             recoildamage = float(score * recoil)
 
         return multiplier, score, recoildamage
+    
+    def bring_ranked_moves(self, battle: AbstractBattle, for_me: bool) -> Optional[List[Dict]]:
+        move_ranks = self._assign_move_ranks(battle, for_me)
+        return self.sort_ranked_moves(move_ranks)
+
+
+    def sort_ranked_moves(self, move_ranks: List[Dict]) -> Optional[List[Dict]]:
+        if not move_ranks or len(move_ranks) == 0:
+            return None
+        move_ranks.sort(key=lambda x: x["damage"], reverse=True)
+        move_ranks_sorted = sorted(
+            move_ranks,
+            key=lambda x: (
+            not x["can_KO"],   # KO moves (can_KO=True) first
+            -x["damage"],      # Higher damage first
+            x["recoildamage"]  # Lower recoil damage first
+            )
+        )
+        return move_ranks_sorted
 
     def _assign_move_ranks(self, battle: AbstractBattle, for_me: bool) -> Optional[List[Dict]]:
         attacker, defender, moves, likely = None, None, None, None
@@ -903,6 +890,96 @@ class CustomAgent(Player):
         if(for_me):
             self.log(battle, f"Move ranks for {attacker.species} vs {defender.species}: {move_ranks}")
         return move_ranks
+    
+    
+    def bring_ranked_switches(self, battle: AbstractBattle) -> Optional[List[Dict]]:
+        me = battle.active_pokemon
+        opp = battle.opponent_active_pokemon
+        if not opp or not battle.available_switches:
+            return None
+              
+        # Evaluate switches by how well they resist likely moves and threaten back
+        candidates = []
+        for sw in battle.available_switches:
+            opp_can_KO = False
+            opp_may_KO = False
+            resist_score = 0.0
+            
+            if opp.moves is None or len(opp.moves) < 4:
+                self.log(battle, f"All moves for {opp.species} not yet known; guess likely moves")   
+                likely = self.opp_model.likely_strong_moves(opp, sw)
+                if likely:
+                    for ef, _ in likely: #TODO: check for survival (ef > 2)
+                        resist_score += {0.5: 8.0, 0.0: 12.0, 2.0: -10.0, 1.0: 0.0}.get(ef, 0.0)
+                    super_effective_count = sum(1 for ef_val, _ in likely if ef_val >= 2)
+                    opp_may_KO = super_effective_count > 0 
+            if opp.moves:
+                self.log(battle, f"Evaluating known {len(opp.moves)} moves for {opp.species}")
+                for mv in opp.moves.values():
+                    if not mv:
+                        continue
+                    eff, predicted_damage, _ = self.estimate_damage(mv, opp, sw,battle.weather)
+                    if predicted_damage >= sw.current_hp and eff > 1.0:
+                        opp_can_KO = True
+                        break
+                    if eff <= 0.0:
+                        bucket = 0.0  # immune
+                    elif eff < 0.75:
+                        bucket = 0.5  # resist
+                    elif eff < 1.5:
+                        bucket = 1.0  # neutral
+                    else:
+                        bucket = 2.0  # super-effective
+
+                    resist_score += {0.5: 8.0, 0.0: 12.0, 2.0: -10.0, 1.0: 0.0}.get(bucket, 0.0)
+            # Offensive threat after switch: check our best immediate move
+            threat = 0.0
+            if sw.moves:
+                # Synthesize a rough "best move" vs opp
+                for m in sw.moves.values():
+                    if not m:
+                        continue
+                    if not is_status_move(m):
+                        #threat = max(threat, effectiveness(m, opp) * (1.5 if has_stab(m, sw) else 1.0))
+                        threat = max(threat, self.estimate_damage(m,sw, opp, battle.weather)[1])
+            # Health consideration
+            hp_factor = sw.current_hp_fraction * 100.0
+            self.log(battle, f"Switch candidate {sw.species}: resist_score {resist_score:.1f}, threat {threat:.1f}, hp_factor {hp_factor:.1f}")
+            #score = resist_score + threat + hp_factor #TOO simplisitic?
+            candidates.append((sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO))
+
+        if not candidates:
+            return None
+        # Sort candidates by threat level from opponent:
+        # 1. Candidates where opp_may_KO and opp_can_KO are both True (worst) -- bottom
+        # 2. Candidates where only opp_can_KO is True -- just above
+        # 3. Candidates where only opp_may_KO is True -- above that
+        # 4. Candidates where neither is True -- best, at the top
+        def candidate_sort_key(x):
+            sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO = x
+            # Lower is better for opp_can_KO/opp_may_KO, so True = 1, False = 0
+            # Both True = 2, only can_KO = 1, only may_KO = 1, neither = 0
+            # But we want both True (worst) at bottom, so use tuple:
+            # (both_true, can_KO, may_KO, -hp, -threat)
+            both_true = int(opp_may_KO and opp_can_KO)
+            return (
+                both_true,
+                int(opp_can_KO),
+                int(opp_may_KO),
+                -hp_factor,
+                -threat,
+                -resist_score
+            )
+
+        candidates_sorted = sorted(
+            candidates,
+            key=candidate_sort_key
+        )
+        
+        self.log(battle, "Sorted switch candidates:")
+        for sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO in candidates_sorted:
+            self.log(battle, f"  {sw.species}: threat {threat:.1f}, hp_factor {hp_factor:.1f}, resist_score {resist_score:.1f}, opp_may_KO {opp_may_KO}, opp_can_KO {opp_can_KO}")
+        return candidates_sorted
                         
     
     def is_possible_KO(self, eff:float, damage: float, target: Pokemon) -> bool:
@@ -1001,134 +1078,6 @@ class CustomAgent(Player):
         
         return False
     
-    def bring_ranked_moves(self, battle: AbstractBattle, for_me: bool) -> Optional[List[Dict]]:
-        move_ranks = self._assign_move_ranks(battle, for_me)
-        return self.sort_ranked_moves(move_ranks)
-
-
-    def sort_ranked_moves(self, move_ranks: List[Dict]) -> Optional[List[Dict]]:
-        if not move_ranks or len(move_ranks) == 0:
-            return None
-        move_ranks.sort(key=lambda x: x["damage"], reverse=True)
-        move_ranks_sorted = sorted(
-            move_ranks,
-            key=lambda x: (
-            not x["can_KO"],   # KO moves (can_KO=True) first
-            -x["damage"],      # Higher damage first
-            x["recoildamage"]  # Lower recoil damage first
-            )
-        )
-        return move_ranks_sorted
-    
-
-    def bring_ranked_switches(self, battle: AbstractBattle) -> Optional[List[Dict]]:
-        me = battle.active_pokemon
-        opp = battle.opponent_active_pokemon
-        if not opp or not battle.available_switches:
-            return None
-              
-        # Evaluate switches by how well they resist likely moves and threaten back
-        candidates = []
-        for sw in battle.available_switches:
-            opp_can_KO = False
-            opp_may_KO = False
-            resist_score = 0.0
-            
-            if opp.moves is None or len(opp.moves) < 4:
-                self.log(battle, f"All moves for {opp.species} not yet known; guess likely moves")   
-                likely = self.opp_model.likely_strong_moves(opp, sw)
-                if likely:
-                    for ef, _ in likely: #TODO: check for survival (ef > 2)
-                        resist_score += {0.5: 8.0, 0.0: 12.0, 2.0: -10.0, 1.0: 0.0}.get(ef, 0.0)
-                    super_effective_count = sum(1 for ef_val, _ in likely if ef_val >= 2)
-                    opp_may_KO = super_effective_count > 0 
-            if opp.moves:
-                self.log(battle, f"Evaluating known {len(opp.moves)} moves for {opp.species}")
-                for mv in opp.moves.values():
-                    if not mv:
-                        continue
-                    eff, predicted_damage, _ = self.estimate_damage(mv, opp, sw,battle.weather)
-                    if predicted_damage >= sw.current_hp and eff > 1.0:
-                        opp_can_KO = True
-                        break
-                    if eff <= 0.0:
-                        bucket = 0.0  # immune
-                    elif eff < 0.75:
-                        bucket = 0.5  # resist
-                    elif eff < 1.5:
-                        bucket = 1.0  # neutral
-                    else:
-                        bucket = 2.0  # super-effective
-
-                    resist_score += {0.5: 8.0, 0.0: 12.0, 2.0: -10.0, 1.0: 0.0}.get(bucket, 0.0)
-            # Offensive threat after switch: check our best immediate move
-            threat = 0.0
-            if sw.moves:
-                # Synthesize a rough "best move" vs opp
-                for m in sw.moves.values():
-                    if not m:
-                        continue
-                    if not is_status_move(m):
-                        #threat = max(threat, effectiveness(m, opp) * (1.5 if has_stab(m, sw) else 1.0))
-                        threat = max(threat, self.estimate_damage(m,sw, opp, battle.weather)[1])
-            # Health consideration
-            hp_factor = sw.current_hp_fraction * 100.0
-            self.log(battle, f"Switch candidate {sw.species}: resist_score {resist_score:.1f}, threat {threat:.1f}, hp_factor {hp_factor:.1f}")
-            #score = resist_score + threat + hp_factor #TOO simplisitic?
-            candidates.append((sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO))
-
-        if not candidates:
-            return None
-        # Sort candidates by threat level from opponent:
-        # 1. Candidates where opp_may_KO and opp_can_KO are both True (worst) -- bottom
-        # 2. Candidates where only opp_can_KO is True -- just above
-        # 3. Candidates where only opp_may_KO is True -- above that
-        # 4. Candidates where neither is True -- best, at the top
-        def candidate_sort_key(x):
-            sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO = x
-            # Lower is better for opp_can_KO/opp_may_KO, so True = 1, False = 0
-            # Both True = 2, only can_KO = 1, only may_KO = 1, neither = 0
-            # But we want both True (worst) at bottom, so use tuple:
-            # (both_true, can_KO, may_KO, -hp, -threat)
-            both_true = int(opp_may_KO and opp_can_KO)
-            return (
-                both_true,
-                int(opp_can_KO),
-                int(opp_may_KO),
-                -hp_factor,
-                -threat,
-                -resist_score
-            )
-
-        candidates_sorted = sorted(
-            candidates,
-            key=candidate_sort_key
-        )
-        
-        self.log(battle, "Sorted switch candidates:")
-        for sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO in candidates_sorted:
-            self.log(battle, f"  {sw.species}: threat {threat:.1f}, hp_factor {hp_factor:.1f}, resist_score {resist_score:.1f}, opp_may_KO {opp_may_KO}, opp_can_KO {opp_can_KO}")
-        return candidates_sorted
-
-
-    # Optional: very conservative tera usage example (disabled by default)
-    def _tera_secures_ko(self, battle: AbstractBattle, move: Move) -> bool:
-        # Heuristic: if tera grants STAB where we didn't have it and bumps predicted KO, allow
-        me = battle.active_pokemon
-        opp = battle.opponent_active_pokemon
-        if not battle.can_tera or not me or not opp:
-            return False
-        atk_type = move_type_name(move)
-        if not atk_type:
-            return False
-        already_stab = has_stab(atk_type, me)
-        if already_stab:
-            return False
-        # Assume tera type equals move type if possible (Showdown requires choosing team tera; poke_env tracks available)
-        # Without exact tera info here, return False to avoid misuse.
-        return False
-    
-
     def _should_set_rocks(self, battle: AbstractBattle) -> bool:
         me = battle.active_pokemon
         # Rule 1: Only our designated setter should use this move.
@@ -1145,6 +1094,8 @@ class CustomAgent(Player):
 
         self.log(battle, "Analysis: Conditions are favorable for setting Stealth Rock.")
         return True
+
+    
 
 
     

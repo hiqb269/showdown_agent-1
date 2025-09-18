@@ -72,7 +72,11 @@ class CustomAgent(Player):
         self.opponent_team_seen = set()
         self.game_phase = "early"
         self.tera_move = False
-        self.debug = True
+        self.debug = False
+
+    def log(self, *args):
+        if self.debug:
+            print(*args)
 
     def get_battle_state(self, battle: AbstractBattle):
         return {
@@ -106,14 +110,11 @@ class CustomAgent(Player):
         else:
             self.game_phase = "late"
         sun_active = self.is_sun_active(getattr(battle, 'weather', None))
-        
-        if self.debug:
-            print(f"Debug: Game phase: {self.game_phase}, Opponent Hazards: {battle.opponent_side_conditions}, Sun: {sun_active}")
+        self.log(f"Debug: Game phase: {self.game_phase}, Opponent Hazards: {battle.opponent_side_conditions}, Sun: {sun_active}")
 
     def has_magic_bounce(self, opponent: Pokemon) -> bool:
         if opponent.ability:
-            if self.debug:
-                print(f"Debug: Checking for Magic Bounce on {opponent.species} with ability {opponent.ability}")
+            self.log(f"Debug: Checking for Magic Bounce on {opponent.species} with ability {opponent.ability}")
         return opponent.ability and "magic bounce" in opponent.ability.lower()
 
     ## NEW HELPER: Checks if we are in a bad matchup
@@ -147,8 +148,7 @@ class CustomAgent(Player):
             if opponent.damage_multiplier(move) > 1:
                 damage = self.estimate_damage(move, state)
                 if opponent.current_hp and damage >= opponent.current_hp:
-                    if self.debug:
-                        print(f"Debug: Found potential KO move: {move.id} with estimated damage {damage:.2f} vs opponent HP {opponent.current_hp}")
+                    self.log(f"Debug: Found potential KO move: {move.id} with estimated damage {damage:.2f} vs opponent HP {opponent.current_hp}")
                     return move
         return None
     
@@ -230,15 +230,13 @@ class CustomAgent(Player):
         if my_pokemon.species != "deoxysspeed":
             deoxys = next((p for p in state["available_switches"] if p.species == "deoxysspeed"), None)
             if deoxys:
-                if self.debug:
-                    print("Debug: Switching to Deoxys-Speed to start hazard setting")
+                self.log("Debug: Switching to Deoxys-Speed to start hazard setting")
                 return deoxys
 
         if self.has_magic_bounce(opponent):
             taunt = next((m for m in state["available_moves"] if m.id == "taunt"), None)
             if taunt:
-                if self.debug:
-                    print("Using Taunt against Magic Bounce")
+                self.log("Debug: Using Taunt against Magic Bounce")
                 return taunt
         
         # Priority list for setting hazards
@@ -246,8 +244,7 @@ class CustomAgent(Player):
         if SideCondition.STEALTH_ROCK not in battle.opponent_side_conditions:
             stealth_rock = next((m for m in state["available_moves"] if m.id == "stealthrock"), None)
             if stealth_rock:
-                if self.debug:
-                    print("Setting Stealth Rock")
+                self.log("Debug: Setting Stealth Rock")
                 return stealth_rock
         
         # 2. Set Spikes up to 3 layers
@@ -255,8 +252,7 @@ class CustomAgent(Player):
         if spikes_layers < 3:
             spikes = next((m for m in state["available_moves"] if m.id == "spikes"), None)
             if spikes:
-                if self.debug:
-                    print(f"Setting Spikes (layer {spikes_layers + 1})")
+                self.log(f"Debug: Setting Spikes (layer {spikes_layers + 1})")
                 return spikes
         
         # If hazards are fully set, resort to best available attack/status
@@ -272,12 +268,10 @@ class CustomAgent(Player):
         # If not a wallbreaker, check if we're in a bad spot before switching
         if my_pokemon.species not in wallbreakers:
             if self.is_bad_matchup(my_pokemon, opponent):
-                if self.debug:
-                    print(f"Debug: {my_pokemon.species} is not a wallbreaker AND is in a bad matchup. Looking to switch.")
+                self.log(f"Debug: {my_pokemon.species} is not a wallbreaker AND is in a bad matchup. Looking to switch.")
                 return self.choose_best_switch(state)
             else:
-                if self.debug:
-                    print(f"Debug: Matchup is favorable for {my_pokemon.species}, staying in to attack.")
+                self.log(f"Debug: Matchup is favorable for {my_pokemon.species}, staying in to attack.")
                 return self.choose_best_attack(state)
 
         return self.choose_best_attack(state)
@@ -294,12 +288,10 @@ class CustomAgent(Player):
         # If not a cleaner, check if we're in a bad spot before switching
         if my_pokemon.species not in cleaners:
             if self.is_bad_matchup(my_pokemon, opponent):
-                if self.debug:
-                    print(f"Debug: {my_pokemon.species} is not a cleaner AND is in a bad matchup. Looking to switch.")
+                self.log(f"Debug: {my_pokemon.species} is not a cleaner AND is in a bad matchup. Looking to switch.")
                 return self.choose_best_switch(state)
             else:
-                if self.debug:
-                    print(f"Debug: Matchup is favorable for {my_pokemon.species}, staying in to attack.")
+                self.log(f"Debug: Matchup is favorable for {my_pokemon.species}, staying in to attack.")
                 return self.choose_best_attack(state)
 
         return self.choose_best_attack(state)
@@ -311,9 +303,8 @@ class CustomAgent(Player):
         swords_dance_move = next((m for m in state["available_moves"] if m.id == "swordsdance"), None)
         if swords_dance_move and my_pokemon.boosts.get('atk', 0) < 2:
             if not self.is_bad_matchup(my_pokemon, opponent) and opponent.current_hp_fraction > 0.5:
-                 if self.debug:
-                    print("Kingambit sees a safe opportunity to use Swords Dance.")
-                 return swords_dance_move
+                self.log("Kingambit sees a safe opportunity to use Swords Dance.")
+                return swords_dance_move
 
         best_attack = self.choose_best_attack(state)
         if not best_attack:
@@ -325,8 +316,7 @@ class CustomAgent(Player):
             if best_attack.type in my_pokemon.types: # If it's a STAB move
                 tera_damage = normal_damage * (2 / 1.5) # Approximate boost from Tera STAB
                 if opponent.current_hp and normal_damage < opponent.current_hp and tera_damage >= opponent.current_hp:
-                    if self.debug:
-                        print("Kingambit: Activating Offensive Tera to secure KO!")
+                    self.log("Kingambit: Activating Offensive Tera to secure KO!")
                     self.tera_move = True
                     
         return best_attack
@@ -347,8 +337,7 @@ class CustomAgent(Player):
 
         # If stats are unknown, calculate damage with a neutral Atk/Def ratio.
         if not attack_stat or not defense_stat:
-            if self.debug:
-                print("Debug: Unknown stats, using conservative damage estimate.")
+            self.log("Debug: Unknown stats, using conservative damage estimate.")
             # Simplified formula assuming Atk/Def ratio is 1.
             estimated_defense = 100  # Arbitrary average defense value
             damage = (((2 * my_pokemon.level / 5 + 2) * move.base_power/estimated_defense) / 50 + 2)
@@ -476,11 +465,11 @@ class CustomAgent(Player):
             return None
         for pokemon in state["available_switches"]:
             score = self.score_switch(pokemon, state)
-            if self.debug: print(f"Debug: Switch score for {pokemon.species}: {score:.2f}")
+            self.log(f"Debug: Switch score for {pokemon.species}: {score:.2f}")
             if score > max_score:
                 max_score = score
                 best_switch = pokemon
-        if self.debug and best_switch: print(f"Debug: Best switch chosen is {best_switch.species} with score {max_score:.2f}")
+        if best_switch: self.log(f"Debug: Best switch chosen is {best_switch.species} with score {max_score:.2f}")
         return best_switch
 
     def choose_best_attack(self, state):
@@ -489,12 +478,12 @@ class CustomAgent(Player):
         if not state["available_moves"]: return None
         for move in state["available_moves"]:
             score = self.score_move(move, state)
-            if self.debug: print(f"Debug: Move score for {move.id}: {score:.2f}")
+            self.log(f"Debug: Move score for {move.id}: {score:.2f}")
             if score > max_score:
                 max_score = score
                 best_move = move
         if best_move:
-            if self.debug: print(f"Choosing best attack: {best_move.id} with score {max_score:.2f}")
+            self.log(f"Choosing best attack: {best_move.id} with score {max_score:.2f}")
             return best_move
         return None
 
@@ -512,28 +501,27 @@ class CustomAgent(Player):
         state = self.get_battle_state(battle)
         self.tera_move = False
 
-        if self.debug:
-            print(f"\n=== Turn {battle.turn} - Phase: {self.game_phase} ===")
-            print(f"Active: {state['my_pokemon'].species} ({state['my_pokemon'].current_hp_fraction:.2%}) vs {state['opponent_pokemon'].species} ({state['opponent_pokemon'].current_hp_fraction:.2%})")
+        
+        self.log(f"\n=== Turn {battle.turn} - Phase: {self.game_phase} ===")
+        self.log(f"Active: {state['my_pokemon'].species} ({state['my_pokemon'].current_hp_fraction:.2%}) vs {state['opponent_pokemon'].species} ({state['opponent_pokemon'].current_hp_fraction:.2%})")
 
         # Priority 1: Check for a winning move that overrides everything
         if state["available_moves"]:
             winning_move = self.has_winning_move(state)
             if winning_move:
-                if self.debug:
-                    print(f"Debug: Found a winning move: {winning_move.id}. OVERRIDING ALL LOGIC.")
+                self.log(f"Debug: Found a winning move: {winning_move.id}. OVERRIDING ALL LOGIC.")
                 return self.create_order(winning_move)
 
         action = None
         if not battle.available_moves:
-            if self.debug: print("Debug: No moves available, must switch.")
+            self.log("Debug: No moves available, must switch.")
             action = self.choose_best_switch(state)
-        #if self.debug: print(f"Debug: Current HP fraction: {state['my_pokemon'].current_hp_fraction}")
+        #if self.debug: self.log(f"Debug: Current HP fraction: {state['my_pokemon'].current_hp_fraction}")
         elif state["my_pokemon"].current_hp_fraction <= 0.4:
-            if self.debug: print("Debug: Low HP detected, evaluating switch options.")
+            self.log("Debug: Low HP detected, evaluating switch options.")
             action = self.choose_best_switch(state)
         elif self.is_bad_matchup(state["my_pokemon"], state["opponent_pokemon"]):
-            if self.debug: print("Debug: Bad matchup detected, evaluating switch options.")
+            self.log("Debug: Bad matchup detected, evaluating switch options.")
             action = self.choose_best_switch(state)
         else:
             if self.game_phase == "early":
@@ -544,14 +532,14 @@ class CustomAgent(Player):
                 action = self.choose_late_game_action(battle, state)
         
         if not action and state["available_switches"]:
-            if self.debug: print("Debug: No suitable move found or switch is preferred, calculating best switch.")
+            self.log("Debug: No suitable move found or switch is preferred, calculating best switch.")
             action = self.choose_best_switch(state)
         
         if not action:
-            if self.debug: print("Debug: CRITICAL FALLBACK - Choosing random move.")
+            self.log("Debug: CRITICAL FALLBACK - Choosing random move.")
             return self.choose_random_move(battle)
-        
-        if self.debug: print(f"Debug: Final action is: {action} {'(TERA)' if self.tera_move else ''}")
+
+        self.log(f"Debug: Final action is: {action} {'(TERA)' if self.tera_move else ''}")
         if action:
             if self.tera_move == True:
                 self.tera_move = False
@@ -559,5 +547,5 @@ class CustomAgent(Player):
             else:
                 return self.create_order(action)
         else:
-            if self.debug: print("Debug: No action determined, choosing random move as last resort.")
+            self.log("Debug: No action determined, choosing random move as last resort.")
             return self.choose_random_move(battle)
