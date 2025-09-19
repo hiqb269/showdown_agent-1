@@ -5,6 +5,7 @@ showdown_agent/scripts/otherplayers
 showdown_agent/scripts/extraplayers
 venv/
 .venv/
+*.txt
 # Default ignored files
 /shelf/
 /workspace.xml
