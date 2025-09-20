@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Dict, List, Optional, Tuple
-import random
 
 from poke_env.battle import AbstractBattle,Weather, MoveCategory
 from poke_env.battle.pokemon import Pokemon
@@ -469,8 +468,10 @@ def type_name(t: Optional[PokemonType]) -> Optional[str]:
         return None
     return getattr(t, "name", str(t))
 
+
 def move_type_name(m: Move) -> Optional[str]:
     return type_name(m.type) if hasattr(m, "type") else None
+
 
 def predict_effectiveness(atk_type: Optional[str], def_types: List[str]) -> float:
     if not atk_type or not def_types:
@@ -516,10 +517,7 @@ def estimate_speed(pokemon):
             estimated_speed *= 1.5
     if hasattr(pokemon, 'ability'): # TODO: check for speed abilities
         if pokemon.ability == 'speedboost':
-            # Speed Boost adds +1 boost per turn, but you might need to track turns
-            # For simplicity, assume no extra boosts unless known
-            pass  # You might add a boost here if you know it activated
-
+            pass
     return int(estimated_speed)
 
 
@@ -532,7 +530,6 @@ def pokemon_types(p: Pokemon) -> List[str]:
 def is_status_move(m: Move) -> bool:
     return m.category == MoveCategory.STATUS
 
-
 def is_hazard_move(m: Move) -> bool:
     name = m.id
     return name in {"stealthrock", "spikes", "toxicspikes", "stickyweb"}
@@ -540,7 +537,6 @@ def is_hazard_move(m: Move) -> bool:
 def is_healing_move(m: Move) -> bool:
     name = m.id
     return name in {"recover", "roost", "slackoff", "softboiled", "moonlight", "morningsun", "synthesis", "rest"}
-
 
 def can_heal(p: Pokemon) -> Optional[Move]:
     if not p or p.fainted:
@@ -590,7 +586,6 @@ class OpponentModel:
             if has_stab(move_type, attacker):
                 eff *= 1.5  # Apply STAB boost
             move_effects.append({"name": move_name, "type": move_type, "effectiveness": eff})
-        # Optionally, sort by effectiveness descending
         move_effects.sort(key=lambda x: x["effectiveness"], reverse=True)
         # Return as list of (effectiveness, move_name)
         ranked = [(m["effectiveness"], m["name"]) for m in move_effects]
@@ -602,10 +597,10 @@ class CustomAgent(Player):
     def __init__(self, *args, **kwargs):
         super().__init__(team=team, *args, **kwargs)
         self.opp_model = OpponentModel()
-        self.debug = False  # Turn off to silence reasoning logs
+        self.debug = True  # Enable detailed logging
+        self.alive_count = 6  # Track non-fainted pokemon count
 
-
-    # ---- Explanation module ----
+    # ---- Logging utility ----
     def log(self, battle: AbstractBattle, msg: str):
         if self.debug:
             #print(f"[Turn {battle.turn}] {msg}")
@@ -619,10 +614,9 @@ class CustomAgent(Player):
                 f.write(f"[Turn {battle.turn}] {msg}\n")
 
 
-    # ---- Core decision logic ----
     def choose_move(self, battle: AbstractBattle):
-        alive_count = sum(1 for p in battle.team.values() if not p.fainted)
-        self.log(battle, f"Non-fainted Pokémon in team: {alive_count}")
+        self.alive_count = sum(1 for p in battle.team.values() if not p.fainted)
+        self.log(battle, f"Non-fainted Pokémon in team: {self.alive_count}")
 
         self.log(battle, f"Active: {battle.active_pokemon.species if battle.active_pokemon else 'None'} \
              ({battle.active_pokemon.current_hp_fraction:.2%} HP) vs \
@@ -654,6 +648,7 @@ class CustomAgent(Player):
 
         # Check if opponent is an immediate threat
         opp_faster, opp_dangerous, opp_is_ko, opp_may_ko = self.is_opp_immediate_threat(battle)
+
         opp_threat = opp_faster and (opp_may_ko or opp_dangerous)
         major_threat = self._is_major_threat(battle) #has boosts
         self.log(battle, f"Opponent dangerous: {opp_dangerous}, has boosts: {major_threat}, faster: {opp_faster}, KO: {opp_is_ko}, opponent may have a ko move: {opp_may_ko}")
@@ -687,7 +682,7 @@ class CustomAgent(Player):
         # PRIORITY 4: TAKE ANY OTHER GUARANTEED KO
         if best_move and (can_ko or attack_move_exists):
             recoildamage = best_move_info.get("recoilDamage", 0) if best_move_info else 0
-            if recoildamage and recoildamage >= opp.current_hp:
+            if recoildamage and self.could_faint(recoildamage, me.current_hp, False):
                  self.log(battle, f"Skipping KO with {best_move.id} due to self-KO recoil risk.")
             else:
                 self.log(battle, f"Priority 4: Securing standard KO on {battle.opponent_active_pokemon.species} with {best_move.id}.")
@@ -751,6 +746,8 @@ class CustomAgent(Player):
                     elif move.type == PokemonType.WATER:
                         mult = mult * 1.5
         return mult
+    
+    
 
     def estimate_damage(self, move: Move, attacker: Pokemon, defender: Pokemon, weather: Weather) -> Tuple[float, float, float]:
         # Very rough expected-damage heuristic combining base power, STAB, effectiveness, and boosts
@@ -843,10 +840,11 @@ class CustomAgent(Player):
         recoildamage = 0.0
         move_ids = []
             # Collect move IDs from actual moves and likely moves
-        if moves:
-            move_ids = [m.id for m in moves if hasattr(m, "id")]
-        if likely: 
-            move_ids += [mv for ef, mv in likely if mv not in move_ids]
+        if self.debug:
+            if moves:
+                move_ids = [m.id for m in moves if hasattr(m, "id")]
+            if likely: 
+                move_ids += [mv for ef, mv in likely if mv not in move_ids]
         #TEST
         self.log(battle, f"Evaluating moves {', '.join(move_ids)} for {attacker.species} vs {defender.species}")
          # Rank moves by estimated damage and other factors
@@ -860,8 +858,8 @@ class CustomAgent(Player):
                     "effectiveness": eff,
                     "damage": damage, 
                     "recoildamage": recoildamage,
-                    "can_KO": self.is_possible_KO(eff,damage, defender),
-                    "can_recoil_KO": self.is_possible_KO(1.5, recoildamage, attacker),
+                    "can_KO": self.is_possible_KO(eff,damage, defender, for_me),
+                    "can_recoil_KO": self.is_possible_KO(1.5, recoildamage, attacker, not for_me),
                     "is_super_effective": eff > 1.0,
                     "is_resisted": eff < 1.0,
                     "is_neutral": eff == 1.0,
@@ -883,7 +881,7 @@ class CustomAgent(Player):
                                 "is_super_effective": ef > 1.0,
                                 "is_resisted": ef < 1.0,
                                 "is_neutral": ef == 1.0,
-                                "may_KO": self.is_possible_KO(ef, -1.00, defender),
+                                "may_KO": self.is_possible_KO(ef, -1.00, defender, for_me),
                             }
                             move_ranks.append(move_info)
         
@@ -919,7 +917,7 @@ class CustomAgent(Player):
                     if not mv:
                         continue
                     eff, predicted_damage, _ = self.estimate_damage(mv, opp, sw,battle.weather)
-                    if predicted_damage >= sw.current_hp and eff > 1.0:
+                    if self.could_faint(predicted_damage, sw.current_hp, False) and eff > 1.0:
                         opp_can_KO = True
                         break
                     if eff <= 0.0:
@@ -944,6 +942,7 @@ class CustomAgent(Player):
                         threat = max(threat, self.estimate_damage(m,sw, opp, battle.weather)[1])
             # Health consideration
             hp_factor = sw.current_hp_fraction * 100.0
+            is_healthy = sw.current_hp > 0.5 * sw.max_hp
             self.log(battle, f"Switch candidate {sw.species}: resist_score {resist_score:.1f}, threat {threat:.1f}, hp_factor {hp_factor:.1f}")
             #score = resist_score + threat + hp_factor #TOO simplisitic?
             candidates.append((sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO))
@@ -980,19 +979,23 @@ class CustomAgent(Player):
         for sw, threat, hp_factor, resist_score, opp_may_KO, opp_can_KO in candidates_sorted:
             self.log(battle, f"  {sw.species}: threat {threat:.1f}, hp_factor {hp_factor:.1f}, resist_score {resist_score:.1f}, opp_may_KO {opp_may_KO}, opp_can_KO {opp_can_KO}")
         return candidates_sorted
-                        
-    
-    def is_possible_KO(self, eff:float, damage: float, target: Pokemon) -> bool:
+
+
+    def is_possible_KO(self, eff: float, damage: float, target: Pokemon, for_me: bool = True) -> bool:
         if not target or target.current_hp is None:
             return False
-        #def_max_hp = target.max_hp if target.max_hp and target.max_hp > 0 else 200.0
-        #est_fraction = min(1.0, damage / def_max_hp)  
-        #if est_fraction >= current_hp_fraction(target):
-        #    return True
-        if eff >= 1.0: #TODO: revist this
-            if damage == -1.00 or damage >= target.current_hp:
-                return True
+        return self.could_faint(damage, target.current_hp, for_me)
+
+
+    def could_faint(self, damage: float, hp: float, for_me: bool) -> bool:
+        if hp is None or damage is None:
+            return False
+        if for_me:   # our move vs opponent
+            return damage >= hp * 1.15   # conservative (avoid overestimating KO chance)
+        if not for_me:  # opponent’s move vs us
+            return damage >= hp * 0.85   # cautious (assume near-KO can still kill)
         return False
+        
     
     def _is_major_threat(self, battle: AbstractBattle) -> bool:
         """Checks if the opponent is a high-priority threat that must be dealt with."""
@@ -1023,23 +1026,23 @@ class CustomAgent(Player):
         # If opponent is faster and has a likely strong move, consider it a threat
         opp_faster = is_first_one_faster(opp, me)
         opp_expected_damage, opp_is_ko, opp_may_ko = self.get_opponent_best_move(battle)
-        opp_dangerous = opp_expected_damage is not None and opp_expected_damage > me.current_hp
+        opp_dangerous = opp_expected_damage is not None and self.could_faint(opp_expected_damage, me.current_hp, False)
         return  opp_faster, opp_dangerous, opp_is_ko, opp_may_ko
 
     def _should_heal(self, opp_can_ko: bool, battle: AbstractBattle) -> bool:
         me = battle.active_pokemon
 
-        # Rule 1: Don't heal if at high health.
+        # Don't heal if at high health.
         if me.current_hp_fraction > 0.8:
             return False
 
-        # Rule 3: Heal if you are a key defensive Pokémon and can safely take a hit.
+        # Heal if you are a key defensive Pokémon and can safely take a hit.
         is_key_pokemon = me.species in ["hooh", "necrozmaduskmane", "arceusground"]
         if is_key_pokemon and me.current_hp_fraction < 0.65 and not opp_can_ko:
             self.log(battle, f"Analysis: {me.species} is a key mon; preserving it with healing.")
             return True
 
-        # Rule 4: Heal if you are low on health but not in immediate KO danger.
+        #Heal if you are low on health but not in immediate KO danger.
         if me.current_hp_fraction < 0.5 and not opp_can_ko:
             self.log(battle, "Analysis: Can safely take a hit; healing is optimal.")
             return True    
@@ -1047,19 +1050,20 @@ class CustomAgent(Player):
 
     def _should_setup(self, battle: AbstractBattle) -> bool:
         me = battle.active_pokemon
-        # Rule 1: Only our designated setup sweeper should use this.
+        # Only our designated setup sweeper should use this.
         if me.species != "arceusground":
             return False
         
-        # Rule 2: Don't set up if already significantly boosted.
+        if self.alive_count < 3:
+            return False    
+        #  Don't set up if already significantly boosted.
         if me.boosts.get('spa', 0) >= 2:
             return False
-
-        # Rule 3: Don't set up if health is too low to be safe.
-        if me.current_hp_fraction < 0.6:
+        #  Don't set up if health is too low to be safe.
+        if me.current_hp_fraction < 0.6: #Initially set to 0.6 - might have to adjust
             return False
 
-        self.log(battle, "Analysis: Opponent is not an immediate threat; good time to set up.")
+        self.log(battle, "Opponent is not an immediate threat; good time to set up.")
         return True
 
     def _should_pivot(self, battle: AbstractBattle, best_switch: Pokemon, switch_damage: float) -> bool:
@@ -1067,32 +1071,34 @@ class CustomAgent(Player):
         opp = battle.opponent_active_pokemon
         if not me or not opp or not best_switch:
             return False
-        # Rule 1: Only our designated pivot should use this.
+        # For a specific pokemon only.
         if me.species != "koraidon":
             return False
         # If a very safe and threatening switch exists (high score), pivoting is a great play.
         # The 'switch_score' here is the estimated damage the switch-in can do.
-        if best_switch and switch_damage > ( opp.current_hp / 2): #why= half? should i check damage or %
-             self.log(battle, f"Analysis: Good pivot opportunity to {best_switch.species}.")
+        if self.could_faint(switch_damage, opp.current_hp, True)  and switch_damage > ( opp.current_hp / 2): #why= half? just a guess 
+             self.log(battle, f"Good pivot opportunity to {best_switch.species}.")
              return True
         
         return False
     
     def _should_set_rocks(self, battle: AbstractBattle) -> bool:
         me = battle.active_pokemon
-        # Rule 1: Only our designated setter should use this move.
+    
         if me.species != "necrozmaduskmane":
             return False
         
-        # Rule 2: Don't set hazards if they're already up.
+        # Don't set hazards if they're already up.
         if "stealthrock" in battle.opponent_side_conditions:
-            return False
-            
-        # Rule 3: It's most valuable in the early-to-mid game.
+            return False    
+
         if battle.turn > 15:
             return False
+        
+        if me.current_hp_fraction < 0.6: #Initially set to 0.6 - might have to adjust
+            return False
 
-        self.log(battle, "Analysis: Conditions are favorable for setting Stealth Rock.")
+        self.log(battle, "Conditions are favorable for setting Stealth Rock.")
         return True
 
     
