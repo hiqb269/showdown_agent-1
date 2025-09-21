@@ -597,7 +597,7 @@ class CustomAgent(Player):
     def __init__(self, *args, **kwargs):
         super().__init__(team=team, *args, **kwargs)
         self.opp_model = OpponentModel()
-        self.debug = True  # Enable detailed logging
+        self.debug = False  # Enable detailed logging
         self.alive_count = 6  # Track non-fainted pokemon count
 
     # ---- Logging utility ----
@@ -627,6 +627,10 @@ class CustomAgent(Player):
         self.opp_model.update_with_battle(battle)
         me = battle.active_pokemon
         opp = battle.opponent_active_pokemon
+
+        if me is None or opp is None:
+            self.log(battle, "No active Pokémon on either side, choosing random move.")
+            return self.choose_random_move(battle)
 
         ranked_switches = []
         best_switch = None

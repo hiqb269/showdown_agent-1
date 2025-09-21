@@ -117,9 +117,13 @@ class CustomAgent(Player):
         best_move = None
         max_damage = -1
 
-        for move in battle.opponent_active_pokemon.moves.values():
+        opp = battle.opponent_active_pokemon
+        if opp is None:
+            return None, 0.0
+
+        for move in opp.moves.values():
             if move.base_power > 0:
-                damage = self._estimate_damage(move, battle.opponent_active_pokemon, battle.active_pokemon)
+                damage = self._estimate_damage(move, opp, battle.active_pokemon)
                 if damage > max_damage:
                     max_damage = damage
                     best_move = move
@@ -157,6 +161,9 @@ class CustomAgent(Player):
 
         active = battle.active_pokemon
         opponent = battle.opponent_active_pokemon
+        
+        if opponent is None or active is None:
+            return self.choose_random_move(battle)
 
         if battle.force_switch:
             best_switch = self.find_best_switch(battle)
@@ -187,15 +194,10 @@ class CustomAgent(Player):
                 if best_switch:
                     return self.create_order(best_switch)
 
-        # Rule 4: None available for the current team - keeping in case team changes
-        pivoting_moves = ['uturn', 'voltswitch']
-        for move_id in pivoting_moves:
-            if move_id in [m.id for m in battle.available_moves]:
-                return self.create_order(Move(move_id, gen=battle.gen))
 
-        # Rule 5: If no other rule applies, use the best damaging move
+        # Rule 4: If no other rule applies, use the best damaging move
         if best_move:
             return self.create_order(best_move)
 
-        # Rule 6: Failsafe
+        # Rule 5: Failsafe
         return self.choose_random_move(battle)
